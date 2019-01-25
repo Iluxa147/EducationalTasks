@@ -3,6 +3,9 @@
 
 #include "Algorithms.h"
 #include "LinearAlgebra.h"
+#include "IPVector.h"
+
+#include "vld.h"
 
 //#define StringDevider //devide your string with any symbol
 
@@ -169,7 +172,14 @@ int main(int argc, char** argv)
 
 
 
+	IPVector<int> v(5);
 
+	v[0] = -1;
+
+	int a = v[0];
+
+	size_t s = v.size();
+	size_t c = v.capacity();
 
 
 	std::cout << '\n';
