@@ -1,0 +1,194 @@
+
+//#define AZAZA
+
+#ifdef AZAZA
+#pragma once
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+#include <chrono>
+#include <random>
+#include <memory>
+#include <set>
+#include <map>
+
+#include "vld.h"
+
+#define MergeSortTmpl
+#define Debug
+
+
+#ifdef MergeSortTmpl
+
+void Merge(int* A, unsigned int l, unsigned int m, unsigned int r)
+{
+	unsigned int n1 = m - l + 1;
+	unsigned int n2 = r - m;
+
+	//std::vector<int> L(n1+1);
+	//std::vector<int> R(n2+1);
+
+	int *L = new int[n1 + 1];
+	int *R = new int[n2 + 1];
+
+	std::cout << "++++++++++++++" << std::endl;
+	std::cout << "&A" << &A << std::endl;
+	std::cout << "p " << l << ' ' << std::endl;
+	std::cout << "q " << m << ' ' << std::endl;
+	std::cout << "r " << r << ' ' << std::endl;
+	std::cout << "n1 " << n1 << ' ' << std::endl;
+	std::cout << "n2 " << n2 << ' ' << std::endl;
+	//std::cout << "L size " << L.size() << ' ' << std::endl;
+	//std::cout << "R size " << R.size() << ' ' << std::endl;
+	std::cout << '\n' << std::endl;
+
+	std::cout << "First Filling: " << std::endl;
+	for (size_t i = 0; i < n1; ++i)
+	{
+		L[i] = A[l + i - 1]; // 1st invariant: at index 1 in L write an A[1]
+		std::cout << "L[" << i << "] " << L[i] << "   " << "A[l + i] " << "A[" << (l + i - 1) << "] " << A[l + i - 1] << std::endl;
+
+	}
+
+	for (size_t i = 0; i < n2; ++i)
+	{
+		//R[i] = A[m + i + 1];
+		//std::cout << "R[" << i << "] " << R[i] << "   " << "A[m + i + 1] " << "A[" << m + i + 1 << "] " << A[m + i + 1] << std::endl;
+
+		R[i] = A[m + i];
+		std::cout << "R[" << i << "] " << R[i] << "   " << "A[m + i + 1] " << "A[" << (m + i) << "] " << A[m + i] << std::endl;
+
+	}
+
+	//signal values in the end
+	L[n1] = INT_MAX;
+	R[n2] = INT_MAX;
+
+	unsigned int i = 0;
+	unsigned int j = 0;
+
+#ifdef Debug
+	std::cout << '\n' << std::endl;
+	std::cout << "After INT_MAX: " << std::endl;
+
+	for (size_t i = 0; i <= n1; ++i)
+	{
+		std::cout << "L[" << i << "] " << L[i] << ' ';
+	}
+	std::cout << '\n' << std::endl;
+
+	for (size_t i = 0; i <= n2; ++i)
+	{
+		std::cout << "R[" << i << "] " << R[i] << ' ';
+	}
+	std::cout << '\n' << std::endl;
+#endif //Debug
+
+	std::cout << "Filling A: " << std::endl;
+
+	for (size_t k = l - 1; k < r; ++k)
+	{
+		//std::cout << k << std::endl;
+
+		if (L[i] <= R[j])
+		{
+			A[k] = L[i];
+			std::cout << "L[" << i << "] " << L[i] << ' ' << "A[" << k << "] " << A[k] << std::endl;
+			++i;
+		}
+		else
+		{
+			A[k] = R[j];
+			std::cout << "R[" << j << "] " << R[j] << ' ' << "A[" << k << "] " << A[k] << ' ' << std::endl;
+			++j;
+		}
+	}
+
+	std::cout << '\n' << std::endl;
+	std::cout << "Before OUT:" << std::endl;
+
+	/*std::cout << "A " << std::endl;
+	for (auto const&n : A)
+	{
+	std::cout << n << ' ';
+	}*/
+	std::cout << '\n';
+	std::cout << "L " << std::endl;
+	for (size_t k = 0; k < i; ++k)
+	{
+		std::cout << L[k] << ' ';
+	}
+
+	std::cout << '\n' << "R " << std::endl;
+	for (size_t k = 0; k < j; ++k)
+	{
+		std::cout << R[k] << ' ';
+	}
+	std::cout << '\n' << std::endl;
+
+	delete[] L;
+	delete[] R;
+}
+
+void MergeSort(int* A, unsigned int start, unsigned int end)
+{
+
+	if (start < end)
+	{
+		unsigned int mid = (start + end) / 2;
+		//std::cout << q << std::endl;
+		MergeSort(A, start, mid);
+		MergeSort(A, mid + 1, end);
+		Merge(A, start, mid, end);
+	}
+
+}
+
+#endif //MergeSortTmpl
+
+int main(int argc, char** argv)
+{
+	//int *zz = new int(1);
+#ifdef MergeSortTmpl
+
+	//std::vector<int> A{ 2, 4, 5, 7, 1, 2, 3, 6 };
+
+	//std::vector<int> A{ 5,2,4,6,1,3,2,6 };
+
+	int A[] = { 5, 2, 4, 6, 1, 3, 2, 6, 0 };
+	constexpr unsigned int arrayLength = sizeof(A) / sizeof(int);
+
+	//std::cout << "&A" << &A << std::endl;
+
+	//unsigned int arrayLength = A.size();
+
+	/*unsigned int p = 1;
+	unsigned int q = 4;
+	unsigned int r = A.size();
+	Merge(A, p, q, r);*/
+
+	MergeSort(A, 1, arrayLength);
+
+	std::cout << '\n' << std::endl;
+
+#ifdef Debug
+	for (const auto &n : A)
+	{
+		std::cout << n << ' ';
+	}
+
+	std::cout << '\n' << std::endl;
+#endif //Debug
+
+#endif //MergeSortTmpl
+
+	system("pause");
+	return 0;
+}
+
+
+
+
+#endif
