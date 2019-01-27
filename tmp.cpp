@@ -1,7 +1,6 @@
+//placeholders are for experiments
 
-//#define AZAZA
-
-#ifdef AZAZA
+#ifdef Placeholder
 #pragma once
 
 #include <iostream>
@@ -191,4 +190,4 @@ int main(int argc, char** argv)
 
 
 
-#endif
+#endif Placeholder

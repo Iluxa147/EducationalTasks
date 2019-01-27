@@ -32,5 +32,8 @@
     <ClInclude Include="IPVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IPException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

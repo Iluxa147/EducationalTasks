@@ -1,5 +1,6 @@
 #include <iostream>
 #include <set>
+#include <vector>
 
 #include "Algorithms.h"
 #include "LinearAlgebra.h"
@@ -170,17 +171,37 @@ int main(int argc, char** argv)
 	}
 #endif BezierFindCoords
 
+	std::vector<int> vv(10);
 
+	int zz = vv[2];
 
-	IPVector<int> v(5);
+	auto gg = vv.back();
+
+	IPVector<int> v(2);
 
 	v[0] = -1;
+	v[1] = 55;
+	v.pushBack(2);
+	auto fff = v[2];
+
 
 	int a = v[0];
+	int b = v[1];
+	//int bb = v[2];
 
-	size_t s = v.size();
-	size_t c = v.capacity();
+	size_t s = v.getSize();
+	size_t c = v.getCapacity();
 
+	auto x = v.begin();
+	auto xz = v.begin()+1;
+	auto xx = v.end();
+	auto xxx = v.end()-1;
+
+	IPVector<int> v2 = v;
+
+	IPVector<int> v3(std::move(v2));
+
+	IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
 
 	std::cout << '\n';
 	system("pause");
