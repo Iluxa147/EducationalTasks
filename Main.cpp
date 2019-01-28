@@ -171,35 +171,38 @@ int main(int argc, char** argv)
 	}
 #endif BezierFindCoords
 
-	std::vector<int> vv(10);
-
-	int zz = vv[2];
-
-	auto gg = vv.back();
-
-	IPVector<int> v(2);
-
-	v[0] = -1;
-	v[1] = 55;
-	v.pushBack(2);
-	auto fff = v[2];
+	auto ii = log((double)20);
+	auto iii = log(2.0);
 
 
-	int a = v[0];
-	int b = v[1];
-	//int bb = v[2];
+	size_t Log = ceil(log((double)20) / log(2.0));
+	auto zzz = (1 << Log);
 
-	size_t s = v.getSize();
-	size_t c = v.getCapacity();
 
-	auto x = v.begin();
-	auto xz = v.begin()+1;
-	auto xx = v.end();
-	auto xxx = v.end()-1;
+	std::vector<int> stdV(20);
+	//stdV[2] = 4;
+	//stdV[9] = 50;
 
-	IPVector<int> v2 = v;
+	//int zz = stdV[2];
 
-	IPVector<int> v3(std::move(v2));
+	stdV.resize(5);
+	stdV.resize(100);
+	stdV.push_back(3);
+	stdV.reserve(5);
+
+	//auto gg = stdV.back();
+	//auto fff = stdV.max_size();
+
+	IPVector<int> v(20);
+
+	v[0] = 4;
+
+	v.resize(5);
+	v.resize(100);
+	v.reserve(150);
+
+	//v.pushBack(2);
+	//auto fff = v[99];
 
 	IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
 

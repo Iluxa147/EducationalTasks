@@ -24,6 +24,8 @@ public:
 	T& back() { return *(end() - 1); };
 	void pushBack(const T &val);
 	void clear();
+	void resize(size_t newSize);
+	void reserve(size_t newCapacity);
 
 	T& operator [] (size_t pos) const;
 	IPVector & operator = (IPVector&& v);
@@ -35,7 +37,7 @@ private:
 };
 
 template<typename T>
-inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size*2)
+inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size)
 {
 	buff_ = (T*)std::calloc(capacity_, sizeof(T));
 }
@@ -61,13 +63,11 @@ inline void IPVector<T>::pushBack(const T & val)
 {
 	if (size_ == capacity_)
 	{
-		capacity_ = size_ * 2;
-		buff_ = (T*)realloc()
-			
+		resize(++size_);
 	}
 	else
 	{
-		buff_[size_++] = val;
+		buff_[++size_] = val;
 	}
 }
 
@@ -77,6 +77,28 @@ inline void IPVector<T>::clear()
 	buff_ = nullptr; // TODO free?
 	size_ = 0;
 	capacity_ = 0;
+}
+
+template<typename T>
+inline void IPVector<T>::resize(size_t newSize)
+{
+	//if (newSize >= size_)
+	//{
+		reserve(newSize);
+		size_ = newSize;
+	//}
+}
+
+template<typename T>
+inline void IPVector<T>::reserve(size_t newCapacity)
+{
+	if (newCapacity > capacity_)
+	{
+		T* tmpBuff;
+		tmpBuff = (T*)realloc(buff_, sizeof(T) * newCapacity);
+		buff_ = tmpBuff;
+		capacity_ = newCapacity;
+	}
 }
 
 template<typename T>
