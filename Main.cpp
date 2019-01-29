@@ -213,7 +213,10 @@ int main(int argc, char** argv)
 	//auto gg = stdV.back();
 	//auto fff = stdV.max_size();
 
+
+	IPVector<int> v11 = { 1,2 };
 	IPVector<int> v(20);
+
 
 	v[0] = 0;
 
@@ -234,6 +237,7 @@ int main(int argc, char** argv)
 
 	v.pushBack(5);
 	ShowV(v);
+	v.clear();
 
 	//v.reserve(150);
 	//v.pushBack(3);
@@ -255,7 +259,7 @@ int main(int argc, char** argv)
 
 
 
-
+	v = v4;
 
 
 
