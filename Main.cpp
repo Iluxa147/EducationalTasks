@@ -10,6 +10,20 @@
 
 //#define StringDevider //devide your string with any symbol
 
+void ShowV(IPVector<int>& v)
+{
+	std::cout << std::endl;
+
+	for (size_t i = 0; i < v.getSize(); ++i)
+	{
+		std::cout << i << "     " << v[i] << std::endl;
+	}
+	std::cout << "Size: " << v.getSize() << std::endl;
+	std::cout << "Capacity: " << v.getCapacity() << std::endl;
+	std::cout << std::endl;
+
+}
+
 int main(int argc, char** argv)
 {
 #ifdef MegreSort
@@ -187,24 +201,55 @@ int main(int argc, char** argv)
 
 	stdV.resize(5);
 	stdV.resize(100);
+	auto ggg = stdV[99];
 	stdV.push_back(3);
 	stdV.reserve(5);
-
 	//auto gg = stdV.back();
 	//auto fff = stdV.max_size();
 
 	IPVector<int> v(20);
 
-	v[0] = 4;
+	v[0] = 0;
 
 	v.resize(5);
-	v.resize(100);
-	v.reserve(150);
+	v.back() = 4;
+
+	ShowV(v);
+
+	v.pushBack(5);
+	ShowV(v);
+
+	//v.resize(100);
+
+
+	//v.reserve(150);
+	//v.pushBack(3);
 
 	//v.pushBack(2);
 	//auto fff = v[99];
 
-	IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
+	
+
+
+
+
+
+
+
+
+
+
+	//IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
+	
+	IPVector<int> v4(std::move(v)); //Move construvtor
+	v4 = IPVector<int>(2);		//=&& operator
+
+
+
+
+
+
+
 
 	std::cout << '\n';
 	system("pause");
