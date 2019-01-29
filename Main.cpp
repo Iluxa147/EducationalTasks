@@ -12,7 +12,7 @@
 
 void ShowV(IPVector<int>& v)
 {
-	std::cout << std::endl;
+	//std::cout << std::endl;
 
 	for (size_t i = 0; i < v.getSize(); ++i)
 	{
@@ -194,6 +194,11 @@ int main(int argc, char** argv)
 
 
 	std::vector<int> stdV(20);
+	stdV.resize(30);
+
+
+
+	stdV.pop_back();
 	//stdV[2] = 4;
 	//stdV[9] = 50;
 
@@ -204,6 +209,7 @@ int main(int argc, char** argv)
 	auto ggg = stdV[99];
 	stdV.push_back(3);
 	stdV.reserve(5);
+	stdV.pop_back();
 	//auto gg = stdV.back();
 	//auto fff = stdV.max_size();
 
@@ -218,9 +224,16 @@ int main(int argc, char** argv)
 
 	v.pushBack(5);
 	ShowV(v);
-
+	v.popBack();
 	//v.resize(100);
+	ShowV(v);
 
+	v.resize(30);
+	ShowV(v);
+
+
+	v.pushBack(5);
+	ShowV(v);
 
 	//v.reserve(150);
 	//v.pushBack(3);
@@ -235,13 +248,9 @@ int main(int argc, char** argv)
 
 
 
-
-
-
-
 	//IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
 	
-	IPVector<int> v4(std::move(v)); //Move construvtor
+	IPVector<int> v4(std::move(v)); //Move constructor
 	v4 = IPVector<int>(2);		//=&& operator
 
 

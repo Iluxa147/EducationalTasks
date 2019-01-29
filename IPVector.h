@@ -1,5 +1,5 @@
 #pragma once
-// TODO capacity_(size*2)?
+// TODO new capacity (size_+ size_/2) ?
 #define DebugException(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
 #define Debug
 
@@ -24,12 +24,13 @@ public:
 	T& front() { return *begin(); };
 	T& back() { return *(end() - 1); };
 	void pushBack(const T &val);
+	void popBack();
 	void clear();
 	void resize(size_t newSize);
 	void reserve(size_t newCapacity);
 
 	T& operator [] (size_t pos) const;
-	IPVector & operator = (IPVector&& v);
+	IPVector<T> & operator = (IPVector<T>&& v);
 	
 private:
 	T* buff_;
@@ -88,9 +89,26 @@ inline void IPVector<T>::pushBack(const T & val)
 }
 
 template<typename T>
+inline void IPVector<T>::popBack()
+{
+#ifdef Debug
+	std::cout << "popBack" << std::endl;
+#endif Debug
+
+	if (size_==0) //error reporter
+	{
+		throw DebugException(L"vector is empty");
+	}
+	else
+	{
+		--size_;
+	}
+}
+
+template<typename T>
 inline void IPVector<T>::clear()
 {
-	buff_ = nullptr; // TODO free/delete?
+	buff_ = nullptr; // TODO free/delete for buff_?
 	size_ = 0;
 	capacity_ = 0;
 }
@@ -130,7 +148,6 @@ inline void IPVector<T>::reserve(size_t newCapacity)
 		delete[] buff_;
 		buff_ = tmpBuff;
 		capacity_ = newCapacity;
-		// TODO delete[] tmpBuff; ?
 	}
 }
 
