@@ -118,6 +118,7 @@
     <ClInclude Include="IPException.h" />
     <ClInclude Include="IPVector.h" />
     <ClInclude Include="LinearAlgebra.h" />
+    <ClInclude Include="MemoryManagement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

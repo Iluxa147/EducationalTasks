@@ -5,8 +5,9 @@
 #include "Algorithms.h"
 #include "LinearAlgebra.h"
 #include "IPVector.h"
+#include "MemoryManagement.h"
 
-#include "vld.h"
+#include "vld.h" //Visual Leak Detector
 
 //#define StringDevider //devide your string with any symbol
 
@@ -185,11 +186,46 @@ int main(int argc, char** argv)
 	}
 #endif BezierFindCoords
 
-	auto ii = log((double)20);
-	auto iii = log(2.0);
+#ifdef PlacementNew
+	PlacementExample();
+#endif PlacementNew
 
 
-	size_t Log = ceil(log((double)20) / log(2.0));
+
+
+
+
+
+	using namespace std;
+
+	// buffer on stack 
+	unsigned char buf[sizeof(int) * 2];
+
+
+	// placement new in buf 
+	int *pInt = new (buf) int();
+	int *pInt2 = new (buf) int;
+	
+	auto gdfgd = pInt;
+	auto lklklk = pInt2;
+
+
+
+	int *qInt = new (buf + sizeof(int)) int(5);
+	int *pBuf = (int*)(buf + 1);
+	int *qBuf = (int*)(buf + sizeof(int));
+	cout << "Buff Addr             Int Addr" << endl;
+	cout << pBuf << "             " << pInt << endl;
+	cout << qBuf << "             " << qInt << endl;
+	cout << "------------------------------" << endl;
+	cout << "1st Int             2nd Int" << endl;
+	cout << *pBuf << "                         "
+		                        << *qBuf << endl;
+	auto ii = log((double)20.0f);
+	auto iii = log(2.0f);
+
+
+	size_t Log = ceil(log((double)20.0f) / log(2.0f));
 	auto zzz = (1 << Log);
 
 
@@ -205,6 +241,8 @@ int main(int argc, char** argv)
 	//int zz = stdV[2];
 
 	stdV.resize(5);
+	stdV.shrink_to_fit();
+
 	stdV.resize(100);
 	auto ggg = stdV[99];
 	stdV.push_back(3);
@@ -228,6 +266,7 @@ int main(int argc, char** argv)
 	v.pushBack(5);
 	ShowV(v);
 	v.popBack();
+	v.shrinkToFit();
 	//v.resize(100);
 	ShowV(v);
 

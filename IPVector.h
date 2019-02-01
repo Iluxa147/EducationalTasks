@@ -27,6 +27,7 @@ public:
 	bool isEmpty() const { return size_ == 0; };
 	T& front() { return *begin(); };
 	T& back() { return *(end() - 1); };
+	void shrinkToFit() { capacity_ = size_; };
 	void pushBack(const T &val);
 	void popBack();
 	void clear();
@@ -85,12 +86,9 @@ inline IPVector<T>::IPVector(IPVector<T>&& v): size_(v.size_), capacity_(v.capac
 	std::cout << "MOVE constructor" << std::endl;
 #endif Debug
 	
-	//reset
 	v.size_ = 0;
 	v.capacity_ = 0;
 	v.buff_ = nullptr;
-
-	//v.clear();
 }
 
 template<typename T>
@@ -136,7 +134,6 @@ inline void IPVector<T>::clear()
 	std::cout << "clear" << std::endl;
 #endif Debug
 
-	//buff_ = nullptr; // TODO free/delete for buff_?
 	size_ = 0;
 	capacity_ = 0;
 	delete[] buff_;
@@ -164,10 +161,9 @@ inline void IPVector<T>::reserve(size_t newCapacity)
 #ifdef Debug
 		std::cout << "reserve" << std::endl;
 #endif Debug
-
 		//tmpBuff = (T*)realloc(buff_, sizeof(T) * newCapacity);
 		T* tmpBuff = new T[newCapacity];
-		//std::copy(begin(), end(), tmpBuff); //TODO deal with 4996
+		//std::copy_n(begin(), end(), tmpBuff); //TODO deal with 4996
 		for (size_t i = 0; i < size_; ++i)
 		{
 			tmpBuff[i] = buff_[i];
@@ -204,14 +200,11 @@ inline IPVector<T> & IPVector<T>::operator=(IPVector&& v)
 #ifdef Debug
 	std::cout << "= && operator" << std::endl;
 #endif Debug
-
-	//delete[] buff_; //TODO disabled, cause no constructor called before?
+	//delete[] buff_; //TODO disabled, cause no constructor was called before?
 	buff_ = v.buff_;
 	size_ = v.size_;
 	capacity_ = v.capacity_;
 
-	//v.clear();
-	//reset
 	v.size_ = 0;
 	v.capacity_ = 0;
 	v.buff_ = nullptr;
