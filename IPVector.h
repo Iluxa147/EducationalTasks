@@ -1,8 +1,8 @@
 #pragma once
 #define VectorStructExample
-#pragma warning(disable: 4996)
 
-// TODO new capacity (size_+ size_/2) ?
+//TODO move method realization inside class
+//TODO new capacity (size_+ size_/2) ?
 #define DebugException(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
 #define Debug
 
@@ -16,11 +16,11 @@ public:
 	Iterator end() { return buff_ + size_; };
 
 	explicit IPVector(size_t size);
-	IPVector(std::initializer_list<int> lst);
-	IPVector(const IPVector<T>& v);
+	IPVector(std::initializer_list<T> lst);
+	explicit IPVector(const IPVector<T>& v);
 	IPVector(IPVector<T>&& v);
 
-	~IPVector() { delete[] buff_; /*free(buff_);*/ };
+	~IPVector() { delete[] buff_; };
 		
 	size_t getSize() const { return size_; };
 	size_t getCapacity() const { return capacity_; };
@@ -39,9 +39,6 @@ public:
 	IPVector<T> & operator = (IPVector<T>&& v);
 
 private:
-	void swap(IPVector<T>&& src);
-
-private:
 	T* buff_;
 	size_t size_;
 	size_t capacity_;
@@ -55,13 +52,18 @@ inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size)
 }
 
 template<typename T>
-inline IPVector<T>::IPVector(std::initializer_list<int> lst)
+inline IPVector<T>::IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()]) //TODO rewrite this constructor
 {
 #ifdef Debug
 	std::cout << "initializer_list constructor" << std::endl;
 #endif Debug
-
-	IPVector(lst.size());
+	
+	int i = 0; // :-))))))
+	for (auto const &n : lst)
+	{
+		buff_[i] = n;
+		++i;
+	}
 }
 
 
@@ -161,16 +163,12 @@ inline void IPVector<T>::reserve(size_t newCapacity)
 #ifdef Debug
 		std::cout << "reserve" << std::endl;
 #endif Debug
-		//tmpBuff = (T*)realloc(buff_, sizeof(T) * newCapacity);
+		std::cout << "buff_: " << buff_ << std::endl;
 		T* tmpBuff = new T[newCapacity];
-		//std::copy_n(begin(), end(), tmpBuff); //TODO deal with 4996
-		for (size_t i = 0; i < size_; ++i)
-		{
-			tmpBuff[i] = buff_[i];
-		}
-		delete[] buff_;
+		tmpBuff = new (buff_) T[newCapacity];
+		std::cout << "tmpBuff: " << tmpBuff << std::endl;
 		buff_ = tmpBuff;
-		capacity_ = newCapacity;
+		std::cout << "buff_: " << buff_ << std::endl;
 	}
 }
 
@@ -200,7 +198,6 @@ inline IPVector<T> & IPVector<T>::operator=(IPVector&& v)
 #ifdef Debug
 	std::cout << "= && operator" << std::endl;
 #endif Debug
-	//delete[] buff_; //TODO disabled, cause no constructor was called before?
 	buff_ = v.buff_;
 	size_ = v.size_;
 	capacity_ = v.capacity_;
@@ -208,10 +205,9 @@ inline IPVector<T> & IPVector<T>::operator=(IPVector&& v)
 	v.size_ = 0;
 	v.capacity_ = 0;
 	v.buff_ = nullptr;
-	
+
 	return *this;
 }
 
-#pragma warning(default: 4996)
 #endif VectorStructExample
 

@@ -14,10 +14,9 @@
 void ShowV(IPVector<int>& v)
 {
 	//std::cout << std::endl;
-
 	for (size_t i = 0; i < v.getSize(); ++i)
 	{
-		std::cout << i << "     " << v[i] << std::endl;
+		std::cout << i << "    val: " << v[i] << "  &: "<< &v[i] << std::endl;
 	}
 	std::cout << "Size: " << v.getSize() << std::endl;
 	std::cout << "Capacity: " << v.getCapacity() << std::endl;
@@ -189,38 +188,7 @@ int main(int argc, char** argv)
 #ifdef PlacementNew
 	PlacementExample();
 #endif PlacementNew
-
-
-
-
-
-
-
-	using namespace std;
-
-	// buffer on stack 
-	unsigned char buf[sizeof(int) * 2];
-
-
-	// placement new in buf 
-	int *pInt = new (buf) int();
-	int *pInt2 = new (buf) int;
 	
-	auto gdfgd = pInt;
-	auto lklklk = pInt2;
-
-
-
-	int *qInt = new (buf + sizeof(int)) int(5);
-	int *pBuf = (int*)(buf + 1);
-	int *qBuf = (int*)(buf + sizeof(int));
-	cout << "Buff Addr             Int Addr" << endl;
-	cout << pBuf << "             " << pInt << endl;
-	cout << qBuf << "             " << qInt << endl;
-	cout << "------------------------------" << endl;
-	cout << "1st Int             2nd Int" << endl;
-	cout << *pBuf << "                         "
-		                        << *qBuf << endl;
 	auto ii = log((double)20.0f);
 	auto iii = log(2.0f);
 
@@ -253,6 +221,8 @@ int main(int argc, char** argv)
 
 
 	IPVector<int> v11 = { 1,2 };
+	ShowV(v11);
+
 	IPVector<int> v(20);
 
 
@@ -271,6 +241,7 @@ int main(int argc, char** argv)
 	ShowV(v);
 
 	v.resize(30);
+	v[29] = 99;
 	ShowV(v);
 
 

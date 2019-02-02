@@ -2,11 +2,7 @@
 /*
 represents memory different types of memory allocations
 */
-//#include <iostream>
-
-
-#define PlacementNew
-
+//#define PlacementNew
 
 #ifdef PlacementNew
 void PlacementExample()
@@ -52,7 +48,7 @@ void PlacementExample()
 	pd2 = new (buffer+N*sizeof(double)) double[N]; // placement new at buffer adress with [N] size
 	for (size_t i = 0; i < N; ++i)
 	{
-		pd4[i] = pd3[i] = 1000 + 60.0*i;
+		pd2[i] = pd1[i] = 1000 + 60.0*i;
 	}
 	std::cout << "Memory contents: \n";
 	for (size_t i = 0; i < N; ++i)
@@ -61,6 +57,7 @@ void PlacementExample()
 		std::cout << pd2[i] << " at " << &pd2[i] << "; \n";
 	}
 	delete[] pd1;
+	//delete[] pd2; //an error cause pd2 is in stack as a buffer var
 	delete[] pd3;
 }
 
