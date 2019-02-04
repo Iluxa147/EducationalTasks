@@ -1,10 +1,11 @@
-#pragma once
-#define VectorStructExample
-
-//TODO move method realization inside class
 //TODO new capacity (size_+ size_/2) ?
+#pragma once
+#ifdef _DEBUG
 #define DebugException(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
 #define Debug
+#endif _DEBUG
+
+#define VectorStructExample
 
 #ifdef VectorStructExample
 template <typename T>
@@ -15,57 +16,196 @@ public:
 	Iterator begin() { return buff_; };
 	Iterator end() { return buff_ + size_; };
 
-	explicit IPVector(size_t size);
-	IPVector(std::initializer_list<T> lst);
-	explicit IPVector(const IPVector<T>& v);
-	IPVector(IPVector<T>&& v);
+	explicit IPVector() : size_(0), capacity_(0), buff_(nullptr)
+	{
+#ifdef Debug
+		std::cout << "default constructor" << std::endl;
+#endif Debug
+	};
+	explicit IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])
+	{
+#ifdef Debug
+		std::cout << "size_t constructor" << std::endl;
+#endif Debug
+	};
+	IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
+	{
+#ifdef Debug
+		std::cout << "initializer_list constructor" << std::endl;
+#endif Debug
+		std::copy(lst.begin(), lst.end(), buff_);
+	};
+	explicit IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new T[v.capacity_]) //explicit copy constructor?
+	{
+#ifdef Debug
+		std::cout << "COPY constructor" << std::endl;
+#endif Debug
+		for (size_t i = 0; i < v.size_; ++i)
+		{
+			buff_[i] = v.buff_[i];
+		}
+	};
+	IPVector(IPVector<T>&& v) noexcept : size_(v.size_), capacity_(v.capacity_), buff_(v.buff_)
+	{
+#ifdef Debug
+		std::cout << "MOVE constructor" << std::endl;
+#endif Debug
+		v.size_ = 0;
+		v.capacity_ = 0;
+		v.buff_ = nullptr;
+	};
 
 	~IPVector() { delete[] buff_; };
-		
+
 	size_t getSize() const { return size_; };
 	size_t getCapacity() const { return capacity_; };
 	bool isEmpty() const { return size_ == 0; };
 	T& front() { return *begin(); };
 	T& back() { return *(end() - 1); };
-	void shrinkToFit() { capacity_ = size_; };
-	void pushBack(const T &val);
-	void popBack();
-	void clear();
-	void resize(size_t newSize);
-	void reserve(size_t newCapacity);
+	void shrinkToFit()
+	{
+#ifdef Debug
+		std::cout << "shrinkToFit" << std::endl;
+#endif Debug
+		capacity_ = size_;
+	};
 
-	T& operator [] (size_t pos) const;
-	IPVector<T> operator = (const IPVector<T>& v);
-	IPVector<T> & operator = (IPVector<T>&& v);
+	void pushBack(const T &val)
+	{
+#ifdef Debug
+		std::cout << "& pushBack" << std::endl;
+#endif Debug
+		if (size_ == 0)
+		{
+			reserve(1);
+		}
+		else if (size_ == capacity_)
+		{
+			reserve(size_ + size_ / 2);
+		}
+		buff_[size_++] = val;
+	};
+	void popBack()
+	{
+#ifdef Debug
+		std::cout << "popBack" << std::endl;
+#endif Debug
+		if (size_ == 0) //error reporter
+		{
+			throw DebugException(L"vector is empty");
+		}
+		else
+		{
+			--size_;
+		}
+	};
+	void clear()
+	{
+#ifdef Debug
+		std::cout << "clear" << std::endl;
+#endif Debug
+		size_ = 0;
+		capacity_ = 0;
+		delete[] buff_;
+	};
+	void resize(size_t newSize)
+	{
+		if (newSize != size_)
+		{
+#ifdef Debug
+			std::cout << "resize" << std::endl;
+#endif Debug
+			reserve(newSize);
+			size_ = newSize;
+		}
+	};
+	void reserve(size_t newCapacity)
+	{
+		if (newCapacity > capacity_)
+		{
+#ifdef Debug
+			std::cout << "reserve" << std::endl;
+#endif Debug
+			T* tmpBuff = new T[newCapacity];
+			for (size_t i = 0; i < size_; ++i)
+			{
+				tmpBuff[i] = buff_[i];
+			}
+			delete[] buff_;
+			buff_ = tmpBuff;
+			capacity_ = newCapacity;
+		}
+	};
+
+	template<class... Args> void emplaceBack(Args&&... args) //TODO WIP
+	{
+#ifdef Debug
+		std::cout << "emplaceBack" << std::endl;
+#endif Debug
+
+		pushBack(T(std::forward<Args>(args)...));
+	}; 
+
+	T& operator [] (size_t index) const
+	{
+		if (size_ <= index) //error reporter
+		{
+			throw DebugException(L"vector index is out of range");
+		}
+		return buff_[index];
+	};
+	IPVector<T>& operator = (const IPVector<T>& v)
+	{
+#ifdef Debug
+		std::cout << "= operator" << std::endl;
+#endif Debug
+		T* tmpBuff = new T[v.size_];
+		for (size_t i = 0; i < v.size_; ++i)
+		{
+			tmpBuff[i] = v.buff_[i];
+		}
+		delete[] buff_;
+		size_ = v.size_;
+		capacity_ = v.capacity_;
+		buff_ = tmpBuff;
+		return *this;
+	};
+	IPVector<T> & operator = (IPVector<T>&& v)
+	{
+#ifdef Debug
+		std::cout << "= && operator" << std::endl;
+#endif Debug
+		buff_ = v.buff_;
+		size_ = v.size_;
+		capacity_ = v.capacity_;
+
+		v.size_ = 0;
+		v.capacity_ = 0;
+		v.buff_ = nullptr;
+
+		return *this;
+	};
 
 private:
-	T* buff_;
 	size_t size_;
 	size_t capacity_;
+	T* buff_;
 };
+#endif VectorStructExample
+
+/*template<typename T>
+inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])
+{}
 
 template<typename T>
-inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size)
-{
-	buff_ = new T[capacity_];
-	//buff_ = (T*)std::calloc(capacity_, sizeof(T));
-}
-
-template<typename T>
-inline IPVector<T>::IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()]) //TODO rewrite this constructor
+inline IPVector<T>::IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
 {
 #ifdef Debug
 	std::cout << "initializer_list constructor" << std::endl;
 #endif Debug
-	
-	int i = 0; // :-))))))
-	for (auto const &n : lst)
-	{
-		buff_[i] = n;
-		++i;
-	}
-}
 
+	std::copy(lst.begin(), lst.end(), buff_);
+}
 
 template<typename T>
 inline IPVector<T>::IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v.capacity_)
@@ -82,7 +222,7 @@ inline IPVector<T>::IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v
 }
 
 template<typename T>
-inline IPVector<T>::IPVector(IPVector<T>&& v): size_(v.size_), capacity_(v.capacity_), buff_(v.buff_)
+inline IPVector<T>::IPVector(IPVector<T>&& v) noexcept: size_(v.size_), capacity_(v.capacity_), buff_(v.buff_)
 {
 #ifdef Debug
 	std::cout << "MOVE constructor" << std::endl;
@@ -163,12 +303,14 @@ inline void IPVector<T>::reserve(size_t newCapacity)
 #ifdef Debug
 		std::cout << "reserve" << std::endl;
 #endif Debug
-		std::cout << "buff_: " << buff_ << std::endl;
 		T* tmpBuff = new T[newCapacity];
-		tmpBuff = new (buff_) T[newCapacity];
-		std::cout << "tmpBuff: " << tmpBuff << std::endl;
+		for (size_t i = 0; i < size_; ++i)
+		{
+			tmpBuff[i] = buff_[i];
+		}
+		delete[] buff_;
 		buff_ = tmpBuff;
-		std::cout << "buff_: " << buff_ << std::endl;
+		capacity_ = newCapacity;
 	}
 }
 
@@ -210,4 +352,4 @@ inline IPVector<T> & IPVector<T>::operator=(IPVector&& v)
 }
 
 #endif VectorStructExample
-
+*/

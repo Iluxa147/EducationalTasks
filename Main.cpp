@@ -11,6 +11,8 @@
 
 //#define StringDevider //devide your string with any symbol
 
+#ifdef VectorStructExample
+
 void ShowV(IPVector<int>& v)
 {
 	//std::cout << std::endl;
@@ -21,8 +23,28 @@ void ShowV(IPVector<int>& v)
 	std::cout << "Size: " << v.getSize() << std::endl;
 	std::cout << "Capacity: " << v.getCapacity() << std::endl;
 	std::cout << std::endl;
-
 }
+
+struct President
+{
+	std::string name;
+	std::string country;
+	int year;
+
+	President() {}
+	President(std::string p_name, std::string p_country, int p_year)
+		: name(std::move(p_name)), country(std::move(p_country)), year(p_year)
+	{
+		std::cout << "I am being constructed.\n";
+	}
+	President(President&& other)
+		: name(std::move(other.name)), country(std::move(other.country)), year(other.year)
+	{
+		std::cout << "I am being moved.\n";
+	}
+	President& operator=(const President& other) = default;
+};
+#endif VectorStructExample
 
 int main(int argc, char** argv)
 {
@@ -188,7 +210,9 @@ int main(int argc, char** argv)
 #ifdef PlacementNew
 	PlacementExample();
 #endif PlacementNew
-	
+
+
+#ifdef VectorStructExample
 	auto ii = log((double)20.0f);
 	auto iii = log(2.0f);
 
@@ -198,16 +222,14 @@ int main(int argc, char** argv)
 
 
 	std::vector<int> stdV(20);
+	std::vector<int> stdB;
 	stdV.resize(30);
-
-
 
 	stdV.pop_back();
 	//stdV[2] = 4;
 	//stdV[9] = 50;
 
 	//int zz = stdV[2];
-
 	stdV.resize(5);
 	stdV.shrink_to_fit();
 
@@ -219,6 +241,13 @@ int main(int argc, char** argv)
 	//auto gg = stdV.back();
 	//auto fff = stdV.max_size();
 
+
+	//auto adssfdf = VectorTestStruct(11, 22);
+	/*IPVector<President> vzz;
+	vzz.emplaceBack("Nelson Mandela", "South Africa", 1994);
+	IPVector<President> vzzz;
+
+	vzzz.pushBack(President("Franklin Delano Roosevelt", "the USA", 1936));*/
 
 	IPVector<int> v11 = { 1,2 };
 	ShowV(v11);
@@ -232,8 +261,8 @@ int main(int argc, char** argv)
 	v.back() = 4;
 
 	ShowV(v);
-
-	v.pushBack(5);
+	//int azaza = 5;
+	v.emplaceBack(5);
 	ShowV(v);
 	v.popBack();
 	v.shrinkToFit();
@@ -242,6 +271,7 @@ int main(int argc, char** argv)
 
 	v.resize(30);
 	v[29] = 99;
+	v[1] = 1;
 	ShowV(v);
 
 
@@ -265,11 +295,20 @@ int main(int argc, char** argv)
 	//IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
 	
 	IPVector<int> v4(std::move(v)); //Move constructor
+	ShowV(v4);
+
 	v4 = IPVector<int>(2);		//=&& operator
+	ShowV(v4);
+
+
+	v = v4; //Copy constructor
+	ShowV(v);
 
 
 
-	v = v4;
+#endif VectorStructExample
+
+
 
 
 
