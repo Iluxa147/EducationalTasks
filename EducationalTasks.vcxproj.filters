@@ -38,5 +38,8 @@
     <ClInclude Include="MemoryManagement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Stuff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,7 +25,7 @@ public:
 	explicit IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])
 	{
 #ifdef Debug
-		std::cout << "size_t constructor" << std::endl;
+		std::cout << "size_t constructor " << size_ << " " << capacity_ << " "<< buff_ <<std::endl;
 #endif Debug
 	};
 	IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
@@ -55,7 +55,11 @@ public:
 		v.buff_ = nullptr;
 	};
 
-	~IPVector() { delete[] buff_; };
+	~IPVector() {
+#ifdef Debug
+		std::cout << "~ " << size_ <<" " <<  capacity_  << " " << buff_ << std::endl;
+#endif Debug
+		delete[] buff_; };
 
 	size_t getSize() const { return size_; };
 	size_t getCapacity() const { return capacity_; };
@@ -87,12 +91,12 @@ public:
 	};
 	void popBack()
 	{
-#ifdef Debug
 		std::cout << "popBack" << std::endl;
-#endif Debug
 		if (size_ == 0) //error reporter
 		{
+#ifdef Debug
 			throw DebugException(L"vector is empty");
+#endif Debug
 		}
 		else
 		{
@@ -148,10 +152,12 @@ public:
 
 	T& operator [] (size_t index) const
 	{
+#ifdef Debug
 		if (size_ <= index) //error reporter
 		{
 			throw DebugException(L"vector index is out of range");
 		}
+#endif Debug
 		return buff_[index];
 	};
 	IPVector<T>& operator = (const IPVector<T>& v)
@@ -159,22 +165,36 @@ public:
 #ifdef Debug
 		std::cout << "= operator" << std::endl;
 #endif Debug
+		if (this == &v)
+		{
+			return *this;
+		}
+		if (v.size_ <= capacity_)
+		{
+			for (size_t i = 0; i < v.size_; ++i)
+			{
+				buff_[i] = v.buff_[i];
+			}
+			size_ = v.size_;
+			return *this;
+		}
 		T* tmpBuff = new T[v.size_];
 		for (size_t i = 0; i < v.size_; ++i)
 		{
 			tmpBuff[i] = v.buff_[i];
 		}
-		delete[] buff_;
+		//delete[] buff_; //TODO ?
 		size_ = v.size_;
 		capacity_ = v.capacity_;
 		buff_ = tmpBuff;
 		return *this;
 	};
-	IPVector<T> & operator = (IPVector<T>&& v)
+	IPVector<T>& operator = (IPVector<T>&& v)
 	{
 #ifdef Debug
 		std::cout << "= && operator" << std::endl;
 #endif Debug
+		delete[] buff_;
 		buff_ = v.buff_;
 		size_ = v.size_;
 		capacity_ = v.capacity_;
@@ -191,6 +211,63 @@ private:
 	size_t capacity_;
 	T* buff_;
 };
+
+template<>
+class IPVector<bool>
+{
+public:
+	explicit IPVector(unsigned int size) : size_(size)
+	{
+#ifdef Debug
+		std::cout << "bool size_t constructor " << size_ << " " << capacity_ << " " << buff_ << std::endl;
+#endif Debug
+
+		if (size <= sizeof(unsigned int)*32)
+		{
+			buff_ = new unsigned int[size];
+			capacity_ = size_;
+		}
+		else
+		{
+			buff_ = new unsigned int[size / 32];
+			capacity_ = size / 32;
+		}
+	};
+	explicit IPVector(const IPVector<bool>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new unsigned int[v.capacity_]) //explicit copy constructor?
+	{
+#ifdef Debug
+		std::cout << "bool COPY constructor" << std::endl;
+#endif Debug
+		for (size_t i = 0; i < v.size_; ++i)
+		{
+			buff_[i] = v.buff_[i];
+		}
+	};
+
+
+	size_t getSize() const { return size_; };
+	size_t getCapacity() const { return capacity_; };
+
+	bool& operator[] (size_t index) const
+	{
+
+	}
+
+
+
+	~IPVector() {
+#ifdef Debug
+		std::cout << "~bool " << size_ << " " << capacity_ << " " << buff_ << std::endl;
+#endif Debug
+		delete[] buff_; };
+
+private:
+	unsigned int size_;
+	unsigned int capacity_;
+	unsigned int* buff_;
+};
+
+
 #endif VectorStructExample
 
 /*template<typename T>

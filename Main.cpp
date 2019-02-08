@@ -6,6 +6,7 @@
 #include "LinearAlgebra.h"
 #include "IPVector.h"
 #include "MemoryManagement.h"
+#include "Stuff.h"
 
 #include "vld.h" //Visual Leak Detector
 
@@ -16,6 +17,7 @@
 void ShowV(IPVector<int>& v)
 {
 	//std::cout << std::endl;
+	std::cout << "&buff_: " << &v[0] << std::endl;
 	for (size_t i = 0; i < v.getSize(); ++i)
 	{
 		std::cout << i << "    val: " << v[i] << "  &: "<< &v[i] << std::endl;
@@ -48,6 +50,13 @@ struct President
 
 int main(int argc, char** argv)
 {
+#ifdef StringReverse
+	std::string str = "ABCDE";
+	StrReverseChar(str);
+	StrReverseXOR(str);
+	std::cout << str << std::endl;
+#endif StringReverse
+
 #ifdef MegreSort
 
 	int A[] = { 5, 2, 4, 6, 1, 3, 2, 6 };
@@ -213,6 +222,7 @@ int main(int argc, char** argv)
 
 
 #ifdef VectorStructExample
+
 	auto ii = log((double)20.0f);
 	auto iii = log(2.0f);
 
@@ -221,8 +231,13 @@ int main(int argc, char** argv)
 	auto zzz = (1 << Log);
 
 
+	IPVector<bool> vvvv11(2);
+
 	std::vector<int> stdV(20);
-	std::vector<int> stdB;
+
+
+
+
 	stdV.resize(30);
 
 	stdV.pop_back();
@@ -277,6 +292,7 @@ int main(int argc, char** argv)
 
 	v.pushBack(5);
 	ShowV(v);
+	v[0] = 1;
 	v.clear();
 
 	//v.reserve(150);
@@ -285,16 +301,29 @@ int main(int argc, char** argv)
 	//v.pushBack(2);
 	//auto fff = v[99];
 
+
+	int a = 5;
+	int b = 6;
+	int &p = a;
+	p = b;
 	
-
-
-
-
-
-
-	//IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
 	
-	IPVector<int> v4(std::move(v)); //Move constructor
+	/*void* a;
+	int b;
+	auto basdasd = sizeof(char);
+
+	a = &b;
+	auto c = static_cast<int*>(a);
+	std::cout << *c;
+	enum MyEnum : int { foo = 4, bar = 5, fddf = 9 };
+	auto zz = static_cast<MyEnum>(5);
+
+	auto pp = sizeof(MyEnum);
+	auto ppp = sizeof(zz);*/
+
+
+	IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
+	//IPVector<int> v4(std::move(v)); //Move constructor
 	ShowV(v4);
 
 	v4 = IPVector<int>(2);		//=&& operator
