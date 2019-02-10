@@ -206,6 +206,19 @@ public:
 		return *this;
 	};
 
+	static void ShowV(IPVector<T>& v)
+	{
+		//std::cout << std::endl;
+		std::cout << "&buff_: " << &v[0] << std::endl;
+		for (size_t i = 0; i < v.getSize(); ++i)
+		{
+			std::cout << i << "    val: " << v[i] << "  &: " << &v[i] << std::endl;
+		}
+		std::cout << "Size: " << v.getSize() << std::endl;
+		std::cout << "Capacity: " << v.getCapacity() << std::endl;
+		std::cout << std::endl;
+	}
+
 private:
 	size_t size_;
 	size_t capacity_;
@@ -218,20 +231,22 @@ class IPVector<bool>
 public:
 	explicit IPVector(unsigned int size) : size_(size)
 	{
+		if (size <= sizeof(unsigned int)*8)
+		{
+			//buff_ = (unsigned int*)std::malloc(sizeof(unsigned int));
+			buff_ = new unsigned int[1]();
+			capacity_ = sizeof(unsigned int) * 8; // = 32 (in bits)
+		}
+		else
+		{
+			//buff_ = (unsigned int*)std::malloc(sizeof(unsigned int)* std::ceil(size / 32));
+			buff_ = new unsigned int[std::ceil(size / 32)]();
+			capacity_ = size / 8;
+		}
 #ifdef Debug
 		std::cout << "bool size_t constructor " << size_ << " " << capacity_ << " " << buff_ << std::endl;
 #endif Debug
 
-		if (size <= sizeof(unsigned int)*32)
-		{
-			buff_ = new unsigned int[size];
-			capacity_ = size_;
-		}
-		else
-		{
-			buff_ = new unsigned int[size / 32];
-			capacity_ = size / 32;
-		}
 	};
 	explicit IPVector(const IPVector<bool>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new unsigned int[v.capacity_]) //explicit copy constructor?
 	{
@@ -243,30 +258,58 @@ public:
 			buff_[i] = v.buff_[i];
 		}
 	};
-
-
+	
 	size_t getSize() const { return size_; };
 	size_t getCapacity() const { return capacity_; };
 
-	bool& operator[] (size_t index) const
+	bool& operator[] (size_t index)
+	{
+		//*buff_ |= 1u << index;
+		unsigned int mask = 1 << index;
+		unsigned int masked = *buff_ & mask;
+		unsigned int bit = masked >> index;
+		bool boolBit = static_cast<bool>(bit);
+
+		return boolBit;
+	};
+
+	void setBit(size_t index, bool val)
 	{
 
 	}
 
+	unsigned int& operator= (size_t val)
+	{
+		return *buff_ |= static_cast<bool>(val) << 0;
+	}
 
 
 	~IPVector() {
 #ifdef Debug
 		std::cout << "~bool " << size_ << " " << capacity_ << " " << buff_ << std::endl;
 #endif Debug
+		//std::free(buff_); };
 		delete[] buff_; };
+
+	static void ShowV(IPVector<bool>& v)
+	{
+		//std::cout << std::endl;
+		std::cout << "&buff_: " << &v[0] << std::endl;
+		for (size_t i = 0; i < v.getSize(); ++i)
+		{
+			std::cout << i << "    val: " << v[i] << "  &: " << &v[i] << std::endl;
+		}
+		std::cout << "Size: " << v.getSize() << std::endl;
+		std::cout << "Capacity: " << v.getCapacity() << std::endl;
+		std::cout << std::endl;
+	}
+
 
 private:
 	unsigned int size_;
 	unsigned int capacity_;
 	unsigned int* buff_;
 };
-
 
 #endif VectorStructExample
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <set>
 #include <vector>
+#include <cassert>
 
 #include "Algorithms.h"
 #include "LinearAlgebra.h"
@@ -14,7 +15,7 @@
 
 #ifdef VectorStructExample
 
-void ShowV(IPVector<int>& v)
+/*void ShowV(IPVector<int>& v)
 {
 	//std::cout << std::endl;
 	std::cout << "&buff_: " << &v[0] << std::endl;
@@ -25,7 +26,7 @@ void ShowV(IPVector<int>& v)
 	std::cout << "Size: " << v.getSize() << std::endl;
 	std::cout << "Capacity: " << v.getCapacity() << std::endl;
 	std::cout << std::endl;
-}
+}*/
 
 struct President
 {
@@ -85,7 +86,7 @@ int main(int argc, char** argv)
 #endif MinMaxSimultaneously
 
 #ifdef InsertionSort
-	
+
 	int arr[] = { 5, 2, 4, 6, 1, 3, 2, 6 };
 	constexpr unsigned int arrayLength = sizeof(arr) / sizeof(int);
 
@@ -223,28 +224,17 @@ int main(int argc, char** argv)
 
 #ifdef VectorStructExample
 
-	auto ii = log((double)20.0f);
+	/*auto ii = log((double)20.0f);
 	auto iii = log(2.0f);
-
-
 	size_t Log = ceil(log((double)20.0f) / log(2.0f));
 	auto zzz = (1 << Log);
-
-
 	IPVector<bool> vvvv11(2);
 
 	std::vector<int> stdV(20);
 
-
-
-
 	stdV.resize(30);
 
 	stdV.pop_back();
-	//stdV[2] = 4;
-	//stdV[9] = 50;
-
-	//int zz = stdV[2];
 	stdV.resize(5);
 	stdV.shrink_to_fit();
 
@@ -252,87 +242,52 @@ int main(int argc, char** argv)
 	auto ggg = stdV[99];
 	stdV.push_back(3);
 	stdV.reserve(5);
-	stdV.pop_back();
-	//auto gg = stdV.back();
-	//auto fff = stdV.max_size();
+	stdV.pop_back();*/
 
-
-	//auto adssfdf = VectorTestStruct(11, 22);
-	/*IPVector<President> vzz;
-	vzz.emplaceBack("Nelson Mandela", "South Africa", 1994);
-	IPVector<President> vzzz;
-
-	vzzz.pushBack(President("Franklin Delano Roosevelt", "the USA", 1936));*/
-
-	IPVector<int> v11 = { 1,2 };
-	ShowV(v11);
-
-	IPVector<int> v(20);
-
-
-	v[0] = 0;
-
-	v.resize(5);
-	v.back() = 4;
-
-	ShowV(v);
-	//int azaza = 5;
-	v.emplaceBack(5);
-	ShowV(v);
-	v.popBack();
-	v.shrinkToFit();
-	//v.resize(100);
-	ShowV(v);
-
-	v.resize(30);
-	v[29] = 99;
-	v[1] = 1;
-	ShowV(v);
-
-
-	v.pushBack(5);
-	ShowV(v);
-	v[0] = 1;
-	v.clear();
-
-	//v.reserve(150);
-	//v.pushBack(3);
-
-	//v.pushBack(2);
-	//auto fff = v[99];
-
-
-	int a = 5;
-	int b = 6;
-	int &p = a;
-	p = b;
+	///T IPVector
+	IPVector<int> vec1 = { 1,2 };
+	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);			//initializer list
 	
+	vec1.resize(30);
+	vec1[0] = 5;
+	vec1[29] = 99;
+	vec1[1] = 1;
+	assert(vec1.getSize() == 30 &&
+		vec1.getCapacity() == 30 &&
+		vec1[0] == 5 && vec1[1] == 1 && vec1[29] == 99 &&
+		&vec1.back() - &vec1.front() + 1 == vec1.getSize());		//resize to bigger
+
+	vec1.popBack();
+	assert(vec1.getSize() == 29 && vec1.getCapacity() == 30);		//popBack
+
+	vec1.shrinkToFit();
+	assert(vec1.getSize() == 29 && vec1.getCapacity() == 29 &&
+		vec1[0] == 5);												//shrinkToFit
+
+
+	vec1.pushBack(5);
+	assert(vec1.getSize() == 30 && vec1.getCapacity() == 43 &&
+		vec1.back() == 5 &&
+		& vec1.back() - &vec1.front() + 1 == vec1.getSize());		//resize to less
+
+	vec1.clear();
+
+	IPVector<int> vec2(IPVector<int>(2)); //TODO no move constructor cuz compiler optimization?
 	
-	/*void* a;
-	int b;
-	auto basdasd = sizeof(char);
+	vec2 = IPVector<int>(2);										
+	assert(vec2.getSize() == 2 && vec2.getCapacity() == 2);			//=&& operator
 
-	a = &b;
-	auto c = static_cast<int*>(a);
-	std::cout << *c;
-	enum MyEnum : int { foo = 4, bar = 5, fddf = 9 };
-	auto zz = static_cast<MyEnum>(5);
-
-	auto pp = sizeof(MyEnum);
-	auto ppp = sizeof(zz);*/
+	vec1 = vec2;
+	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);			//copy constructor
 
 
-	IPVector<int> v4(IPVector<int>(2)); //TODO not a move constructor ?
-	//IPVector<int> v4(std::move(v)); //Move constructor
-	ShowV(v4);
-
-	v4 = IPVector<int>(2);		//=&& operator
-	ShowV(v4);
+	///bool IPVector
+	IPVector<bool> vecBool1(2);
 
 
-	v = v4; //Copy constructor
-	ShowV(v);
+	vecBool1[0] = 1;
 
+	IPVector<bool>::ShowV(vecBool1);
 
 
 #endif VectorStructExample
