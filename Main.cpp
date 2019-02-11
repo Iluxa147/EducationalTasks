@@ -282,10 +282,11 @@ int main(int argc, char** argv)
 
 
 	///bool IPVector
-	IPVector<bool> vecBool1(2);
-
-
-	vecBool1[0] = 1;
+	IPVector<bool> vecBool1(32);
+	
+	vecBool1[0] = true;
+	//vecBool1[32] = true;
+	vecBool1[31] = true;
 
 	IPVector<bool>::ShowV(vecBool1);
 
