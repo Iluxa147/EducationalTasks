@@ -228,20 +228,14 @@ private:
 template<>
 class IPVector<bool>
 {
-	class BitHelper
+	struct BitHelper
 	{
 	public:
-		explicit BitHelper(unsigned int* container, unsigned int index) : container_(container), index_(index) {
-		
-			//std::cout << "BitHelper constructor " << container_ << std::endl;
-
-		};
+		explicit BitHelper(unsigned int* container, unsigned int index) : container_(container), index_(index) {};
 
 		void operator = (const bool val)
 		{
 			val ? *container_ |= 1u << index_ : *container_ &= ~(1u << index_); //1u is a mask like 0x00000001u
-			//std::cout << "BitHelper operator = " << container_ << std::endl;
-
 		}
 
 		operator bool() const
@@ -249,12 +243,10 @@ class IPVector<bool>
 			return (*container_ >> index_) & 1u;
 		}
 
-
 		unsigned int& operator[](size_t index)
 		{
 			return *container_;
 		}
-
 
 	private:
 		unsigned int* container_;
@@ -287,7 +279,6 @@ public:
 #ifdef Debug
 		std::cout << "bool size_t constructor " << size_ << " " << capacity_ << " " << buff_ << " " << &buff_[0] << std::endl;
 #endif Debug
-
 	};
 	/*explicit IPVector(const IPVector<bool>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new unsigned int[v.capacity_]) //explicit copy constructor?
 	{
@@ -300,36 +291,33 @@ public:
 		}
 	};*/
 	
+	unsigned int* getBlockAddress(unsigned int index) const { return &buff_[index / blockSize_]; };
 	size_t getSize() const { return size_; };
 	size_t getCapacity() const { return capacity_; };
 	bool isEmpty() const { return size_ == 0; };
 	unsigned int& front() { return *begin(); };
 	unsigned int& back() { return *(end() - 1); };
-
-	BitHelper operator[] (size_t index)
+	void shrinkToFit()
 	{
-		//*buff_ |= 1u << index;
-		/*unsigned int mask = 1 << index;
-		unsigned int masked = *buff_ & mask;
-		unsigned int bit = masked >> index;
-		bool boolBit = static_cast<bool>(bit);*/
-		//unsigned int blockNumber = std::ceil(static_cast<float>(index+1) / static_cast<float>(blockSize_));
-		
-		//std::cout << "operator[] " << &buff_[index / blockSize_] << " " << buff_[index / blockSize_] << std::endl;
-		std::cout << sizeof(BitHelper) << std::endl;
-		return BitHelper(&buff_[index / blockSize_], index);
+#ifdef Debug
+		std::cout << "shrinkToFit" << std::endl;
+#endif Debug
+		capacity_ = size_;
 	};
 
-	/*const unsigned int& operator[] (size_t index) const
+	BitHelper operator[] (size_t index) const
 	{
-		auto dgfdf = buff_[index / blockSize_];
-		return buff_[index / blockSize_];
-	}*/
-	/*unsigned int& operator= (size_t val)
-	{
-		return *buff_ |= static_cast<bool>(val) << 0;
-	}*/
-
+		/* *buff_ |= 1u << index;
+		unsigned int mask = 1 << index;
+		unsigned int masked = *buff_ & mask;
+		unsigned int bit = masked >> index;
+		bool boolBit = static_cast<bool>(bit);
+		unsigned int blockNumber = std::ceil(static_cast<float>(index+1) / static_cast<float>(blockSize_));
+		
+		std::cout << "operator[] " << &buff_[index / blockSize_] << " " << buff_[index / blockSize_] << std::endl;
+		std::cout << sizeof(BitHelper) << std::endl;*/
+		return BitHelper(&buff_[index / blockSize_], index);
+	};
 
 	~IPVector() {
 #ifdef Debug
@@ -340,29 +328,22 @@ public:
 
 	static void ShowV(const IPVector<bool>& v)
 	{
-		std::cout << "**********************SHOW**********************"<<std::endl;
-		//std::cout <<&v << " &buff_: " << " val: " << v[0] << "  &: " << &v[0] << std::endl;
-		const int yy = 0;
-		std::cout << 0 << "    val: " << v[0] << "  &: " << &v[yy] << std::endl;
-		std::cout << 0 << "    val: " << v[0] << "  &: " << &v[0] << std::endl;
+		std::cout << "&buff_: " << v.getBlockAddress(0) << std::endl;
 
-		/*for (size_t i = 0; i < v.getSize(); ++i)
+		for (size_t i = 0; i < v.getSize(); ++i)
 		{
-			std::cout << i << "    val: " << v[i] << "  &: " << &v[i] << std::endl;
-		}*/
+			std::cout << i << "    val: " << v[i] << "  &: " << v.getBlockAddress(i) << std::endl;
+		}
 		std::cout << "Size: " << v.getSize() << std::endl;
 		std::cout << "Capacity: " << v.getCapacity() << std::endl;
 		std::cout << std::endl;
 	}
 
-
 private:
-	unsigned int size_;
-	unsigned int capacity_;
-	unsigned int* buff_;
+	unsigned int size_;			//in bits
+	unsigned int capacity_;		//in bits
+	unsigned int* buff_;		//min block size is sizeof(unsigned int) = 8 bytes = 32bits 
 };
-
-
 #endif VectorStructExample
 
 /*template<typename T>

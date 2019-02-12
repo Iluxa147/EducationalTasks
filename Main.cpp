@@ -224,26 +224,6 @@ int main(int argc, char** argv)
 
 #ifdef VectorStructExample
 
-	/*auto ii = log((double)20.0f);
-	auto iii = log(2.0f);
-	size_t Log = ceil(log((double)20.0f) / log(2.0f));
-	auto zzz = (1 << Log);
-	IPVector<bool> vvvv11(2);
-
-	std::vector<int> stdV(20);
-
-	stdV.resize(30);
-
-	stdV.pop_back();
-	stdV.resize(5);
-	stdV.shrink_to_fit();
-
-	stdV.resize(100);
-	auto ggg = stdV[99];
-	stdV.push_back(3);
-	stdV.reserve(5);
-	stdV.pop_back();*/
-
 	///T IPVector
 	IPVector<int> vec1 = { 1,2 };
 	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);			//initializer list
@@ -265,9 +245,9 @@ int main(int argc, char** argv)
 		vec1[0] == 5);												//shrinkToFit
 
 
-	vec1.pushBack(5);
-	assert(vec1.getSize() == 30 && vec1.getCapacity() == 43 &&
-		vec1.back() == 5 &&
+	vec1.resize(5);
+	assert(vec1.getSize() == 5 && vec1.getCapacity() == 29 &&
+		//vec1.back() == 5 &&
 		& vec1.back() - &vec1.front() + 1 == vec1.getSize());		//resize to less
 
 	vec1.clear();
@@ -282,11 +262,10 @@ int main(int argc, char** argv)
 
 
 	///bool IPVector
-	IPVector<bool> vecBool1(32);
+	IPVector<bool> vecBool1(33);
 	
 	vecBool1[0] = true;
-	//vecBool1[32] = true;
-	vecBool1[31] = true;
+	vecBool1[32] = true;
 
 	IPVector<bool>::ShowV(vecBool1);
 
