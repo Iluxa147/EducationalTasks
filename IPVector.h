@@ -4,7 +4,7 @@
 #ifdef _DEBUG
 #define DebugException(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
 #define Debug
-#endif _DEBUG
+#endif //_DEBUG
 
 #define VectorStructExample
 
@@ -21,19 +21,19 @@ public:
 	{
 #ifdef Debug
 		std::cout << "default constructor" << std::endl;
-#endif Debug
+#endif //Debug
 	};
 	explicit IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])
 	{
 #ifdef Debug
 		std::cout << "size_t constructor " << size_ << " " << capacity_ << " "<< buff_ <<std::endl;
-#endif Debug
+#endif //Debug
 	};
 	explicit IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new T[v.capacity_]) //explicit copy constructor?
 	{
 #ifdef Debug
 		std::cout << "COPY constructor" << std::endl;
-#endif Debug
+#endif //Debug
 		for (size_t i = 0; i < v.size_; ++i)
 		{
 			buff_[i] = v.buff_[i];
@@ -43,7 +43,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "MOVE constructor" << std::endl;
-#endif Debug
+#endif //Debug
 		v.size_ = 0;
 		v.capacity_ = 0;
 		v.buff_ = nullptr;
@@ -52,14 +52,14 @@ public:
 	{
 #ifdef Debug
 		std::cout << "initializer_list constructor" << std::endl;
-#endif Debug
+#endif //Debug
 		std::copy(lst.begin(), lst.end(), buff_);
 	};
 
 	~IPVector() {
 #ifdef Debug
 		std::cout << "~ " << size_ <<" " <<  capacity_  << " " << buff_ << std::endl;
-#endif Debug
+#endif //Debug
 		delete[] buff_; };
 
 	size_t getSize() const { return size_; };
@@ -72,7 +72,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "shrinkToFit" << std::endl;
-#endif Debug
+#endif //Debug
 		if (size_ < capacity_)
 		{
 			T* tmpBuff = new T[size_];
@@ -89,7 +89,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "& pushBack" << std::endl;
-#endif Debug
+#endif //Debug
 		if (size_ == 0)
 		{
 			reserve(1);
@@ -107,7 +107,7 @@ public:
 		{
 #ifdef Debug
 			throw DebugException(L"vector is empty");
-#endif Debug
+#endif //Debug
 		}
 		else
 		{
@@ -118,7 +118,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "clear" << std::endl;
-#endif Debug
+#endif //Debug
 		size_ = 0;
 		capacity_ = 0;
 		delete[] buff_;
@@ -130,7 +130,7 @@ public:
 		{
 #ifdef Debug
 			std::cout << "resize" << std::endl;
-#endif Debug
+#endif //Debug
 			reserve(newSize);
 			size_ = newSize;
 		}
@@ -141,35 +141,36 @@ public:
 		{
 #ifdef Debug
 			std::cout << "reserve" << std::endl;
-#endif Debug
+#endif //Debug
 			T* tmpBuff = new T[newCapacity];
 			for (size_t i = 0; i < size_; ++i)
 			{
 				tmpBuff[i] = buff_[i];
 			}
-			if (buff_!=nullptr)
-			{
-				delete[] buff_;
-			}
+			delete[] buff_;
 			buff_ = tmpBuff;
 			capacity_ = newCapacity;
 		}
 	};
 
-	template<class... Args> void emplaceBack(Args&&... args) //TODO WIP
+	template<class... Args>
+	void emplaceBack(Args&&... args) //TODO WIP
 	{
 #ifdef Debug
 		std::cout << "emplaceBack" << std::endl;
-#endif Debug
-
-		pushBack(T(std::forward<Args>(args)...));
-	}; 
+#endif //Debug
+		if (size_ >= capacity_)
+		{
+			reserve(size_ + size_ / 2);
+		}
+		new(&buff_[size_++]) T(std::forward<Args>(args)...);
+	};
 
 	IPVector<T>& operator = (const IPVector<T>& v)
 	{
 #ifdef Debug
 		std::cout << "= operator" << std::endl;
-#endif Debug
+#endif //Debug
 		if (this == &v)
 		{
 			return *this;
@@ -188,10 +189,7 @@ public:
 		{
 			tmpBuff[i] = v.buff_[i];
 		}
-		if (buff_ != nullptr)
-		{
-			delete[] buff_;
-		}
+		delete[] buff_;
 		size_ = v.size_;
 		capacity_ = v.capacity_;
 		buff_ = tmpBuff;
@@ -201,11 +199,8 @@ public:
 	{
 #ifdef Debug
 		std::cout << "= && operator" << std::endl;
-#endif Debug
-		if (buff_ != nullptr)
-		{
-			delete[] buff_;
-		}
+#endif //Debug
+		delete[] buff_;
 		buff_ = v.buff_;
 		size_ = v.size_;
 		capacity_ = v.capacity_;
@@ -223,7 +218,7 @@ public:
 		{
 			throw DebugException(L"vector index is out of range");
 		}
-#endif Debug
+#endif //Debug
 		return buff_[index];
 	};
 	
@@ -285,7 +280,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "default constructor" << std::endl;
-#endif Debug
+#endif //Debug
 	};
 	explicit IPVector(unsigned int size) : size_(size)
 	{
@@ -305,13 +300,13 @@ public:
 		}
 #ifdef Debug
 		std::cout << "bool size_t constructor " << size_ << " " << capacity_ << " " << buff_ << " " << &buff_[0] << std::endl;
-#endif Debug
+#endif //Debug
 	};
 	explicit IPVector(const IPVector<bool>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new unsigned int[v.capacity_/blockSize_]) //explicit copy constructor?
 	{
 #ifdef Debug
 		std::cout << "bool COPY constructor" << std::endl;
-#endif Debug
+#endif //Debug
 		for (size_t i = 0; i < v.size_; ++i)
 		{
 			buff_[i] = v.buff_[i];
@@ -321,7 +316,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "bool MOVE constructor" << std::endl;
-#endif Debug
+#endif //Debug
 		v.size_ = 0;
 		v.capacity_ = 0;
 		v.buff_ = nullptr;
@@ -338,7 +333,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "shrinkToFit" << std::endl;
-#endif Debug
+#endif //Debug
 		unsigned int blocksCount = size_ / blockSize_ + 1;
 
 		if (size_ < capacity_)
@@ -357,7 +352,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "bool pushBack" << std::endl;
-#endif Debug
+#endif //Debug
 		if (size_ == 0)
 		{
 			reserve(1);
@@ -376,7 +371,7 @@ public:
 		{
 #ifdef Debug
 			throw DebugException(L"vector is empty");
-#endif Debug
+#endif //Debug
 		}
 		else
 		{
@@ -387,7 +382,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "bool clear" << std::endl;
-#endif Debug
+#endif //Debug
 		size_ = 0;
 		capacity_ = 0;
 		delete[] buff_;
@@ -399,7 +394,7 @@ public:
 		{
 #ifdef Debug
 			std::cout << "bool resize" << std::endl;
-#endif Debug
+#endif //Debug
 			reserve(newSize);
 			size_ = newSize;
 		}
@@ -410,7 +405,7 @@ public:
 		{
 #ifdef Debug
 			std::cout << "bool reserve" << std::endl;
-#endif Debug
+#endif //Debug
 			unsigned int blocksCount = newCapacity / blockSize_ + 1;
 
 			unsigned int* tmpBuff = new unsigned int[blocksCount];
@@ -418,10 +413,7 @@ public:
 			{
 				tmpBuff[i] = buff_[i];
 			}
-			if (buff_ != nullptr)
-			{
-				delete[] buff_;
-			}
+			delete[] buff_;
 			buff_ = tmpBuff;
 			capacity_ = newCapacity;
 		}
@@ -461,7 +453,7 @@ public:
 	{
 #ifdef Debug
 		std::cout << "bool = && operator" << std::endl;
-#endif Debug
+#endif //Debug
 		if (buff_ != nullptr)
 		{
 			delete[] buff_;
@@ -495,7 +487,7 @@ public:
 	~IPVector() {
 #ifdef Debug
 		std::cout << "~bool " << size_ << " " << capacity_ << " " << buff_ << " " << buff_[0] << std::endl;
-#endif Debug
+#endif //Debug
 		//std::free(buff_); };
 		delete[] buff_; };
 
@@ -517,7 +509,7 @@ private:
 	unsigned int capacity_;		//in bits
 	unsigned int* buff_;		//min block size is sizeof(unsigned int) = 8 bytes = 32bits
 };
-#endif VectorStructExample
+#endif //VectorStructExample
 
 /*template<typename T>
 inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])

@@ -221,7 +221,6 @@ int main(int argc, char** argv)
 	PlacementExample();
 #endif PlacementNew
 
-
 #ifdef VectorStructExample
 
 	std::vector<int> v(2);
@@ -229,49 +228,101 @@ int main(int argc, char** argv)
 	v.resize(5);
 
 	v.shrink_to_fit();
-
+	v.emplace_back();
 	std::vector<bool> b1(2);
 	b1[0] = 1;
 	auto fdfd = b1.front();
 	auto sa = b1.begin();
 
 	///T IPVector
-	IPVector<int> vec1 = { 1,2 };
-	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);			//initializer list
-	
-	vec1.resize(30);
-	vec1[0] = 5;
-	vec1[29] = 99;
-	vec1[1] = 1;
-	assert(vec1.getSize() == 30 &&
-		vec1.getCapacity() == 30 &&
-		vec1[0] == 5 && vec1[1] == 1 && vec1[29] == 99 &&
-		&vec1.back() - &vec1.front() + 1 == vec1.getSize());		//resize to bigger
+	//initializer list
+	auto initList = []()
+	{
+		IPVector<int> vec1 = { 1,2 };
+		assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);
+	};
+	initList();
 
-	vec1.popBack();
-	assert(vec1.getSize() == 29 && vec1.getCapacity() == 30);		//popBack
+	//resize to bigger
+	auto resizeToBigger = []()
+	{
+		IPVector<int> vec1 = { 1,2 };
+		vec1[0] = 5;
+		vec1[1] = 1;
+		vec1.resize(30);
+		vec1[29] = 99;
+		assert(vec1.getSize() == 30 &&
+			vec1.getCapacity() == 30 &&
+			vec1[0] == 5 && vec1[1] == 1 && vec1[29] == 99 &&
+			&vec1.back() - &vec1.front() + 1 == vec1.getSize());
+	};
+	resizeToBigger();
 
-	vec1.shrinkToFit();
-	assert(vec1.getSize() == 29 && vec1.getCapacity() == 29 &&
-		vec1[0] == 5);												//shrinkToFit
-	
-	vec1.resize(5);
-	assert(vec1.getSize() == 5 && vec1.getCapacity() == 29 &&
-		vec1[0] == 5 &&
-		& vec1.back() - &vec1.front() + 1 == vec1.getSize());		//resize to less
+	//resize to less
+	auto resizeToLess = []()
+	{
+		IPVector<int> vec1(30);
+		vec1.resize(5);
+		vec1[0] = 5;
+		vec1.popBack();
+		assert(vec1.getSize() == 4 && vec1.getCapacity() == 30 &&
+			vec1[0] == 5 &&
+			& vec1.back() - &vec1.front() + 1 == vec1.getSize());
+	};
+	resizeToLess();
 
-	vec1.clear();
+	//popBack
+	auto popBack = []()
+	{
+		IPVector<int> vec1(30);
+		vec1[0] = 1;
+		vec1.popBack();
+		assert(vec1.getSize() == 29 && vec1.getCapacity() == 30 &&
+			vec1[0] == 1);
+	};
+	popBack();
 
-	IPVector<int> vec2(IPVector<int>(2)); //TODO no move constructor cuz compiler optimization?
-	
-	vec2 = IPVector<int>(2);										
-	assert(vec2.getSize() == 2 && vec2.getCapacity() == 2);			//=&& operator
+	//shrinkToFit
+	auto shrink = []()
+	{
+		IPVector<int> vec1(30);
+		vec1[0] = 1;
+		vec1.popBack();
+		vec1.shrinkToFit();
+		assert(vec1.getSize() == 29 && vec1.getCapacity() == 29 &&
+			vec1[0] == 1);
+	};
+	shrink();
 
-	vec1.pushBack(5);
-	vec2[1] = 5;
-	vec1 = vec2;
-	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2 &&
-		vec1[1] == 5);												//= operator
+	//copyMoveSemantics
+	auto copyMoveSemantics = []()
+	{
+		IPVector<int> vec1(30);
+		vec1[0] = 1;
+		vec1.clear();
+		IPVector<int> vec2(IPVector<int>(2)); //TODO no move constructor cuz compiler optimization?
+
+		vec2 = IPVector<int>(2);
+		assert(vec2.getSize() == 2 && vec2.getCapacity() == 2);			//=&& operator
+
+		vec1.pushBack(5);
+		vec2[1] = 5;
+		vec1 = vec2;
+		assert(vec1.getSize() == 2 && vec1.getCapacity() == 2 &&
+			vec1[1] == 5);												//= operator
+	};
+	copyMoveSemantics();
+
+	//copyMoveSemantics
+	auto emplace = []()
+	{
+		IPVector<int> vec1(5);
+		vec1.emplaceBack();
+	};
+	emplace();
+
+
+
 
 	///bool IPVector
 	IPVector<bool> vecBool1(33);
@@ -289,7 +340,7 @@ int main(int argc, char** argv)
 	IPVector<bool> vecBool2(IPVector<bool>(2));
 	
 	vecBool2 = vecBool1;
-	assert(vecBool2.getSize() == 33 && vecBool2.getCapacity() == 64 &&
+	assert(vecBool2.getSize() == 34 && vecBool2.getCapacity() == 64 &&
 		vecBool2[0] == true && vecBool2[32] == true);				//= operator
 
 	
