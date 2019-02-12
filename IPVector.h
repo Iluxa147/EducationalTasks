@@ -1,4 +1,5 @@
 //TODO new capacity (size_+ size_/2) ?
+//TODO <bool> blocksCount to separate function?
 #pragma once
 #ifdef _DEBUG
 #define DebugException(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
@@ -28,13 +29,6 @@ public:
 		std::cout << "size_t constructor " << size_ << " " << capacity_ << " "<< buff_ <<std::endl;
 #endif Debug
 	};
-	IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
-	{
-#ifdef Debug
-		std::cout << "initializer_list constructor" << std::endl;
-#endif Debug
-		std::copy(lst.begin(), lst.end(), buff_);
-	};
 	explicit IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new T[v.capacity_]) //explicit copy constructor?
 	{
 #ifdef Debug
@@ -54,6 +48,13 @@ public:
 		v.capacity_ = 0;
 		v.buff_ = nullptr;
 	};
+	IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
+	{
+#ifdef Debug
+		std::cout << "initializer_list constructor" << std::endl;
+#endif Debug
+		std::copy(lst.begin(), lst.end(), buff_);
+	};
 
 	~IPVector() {
 #ifdef Debug
@@ -66,14 +67,24 @@ public:
 	bool isEmpty() const { return size_ == 0; };
 	T& front() { return *begin(); };
 	T& back() { return *(end() - 1); };
+	
 	void shrinkToFit()
 	{
 #ifdef Debug
 		std::cout << "shrinkToFit" << std::endl;
 #endif Debug
-		capacity_ = size_;
+		if (size_ < capacity_)
+		{
+			T* tmpBuff = new T[size_];
+			for (size_t i = 0; i < size_; ++i)
+			{
+				tmpBuff[i] = buff_[i];
+			}
+			delete[] buff_;
+			buff_ = tmpBuff;
+			capacity_ = size_;
+		}
 	};
-
 	void pushBack(const T &val)
 	{
 #ifdef Debug
@@ -111,6 +122,7 @@ public:
 		size_ = 0;
 		capacity_ = 0;
 		delete[] buff_;
+		buff_ = nullptr;
 	};
 	void resize(size_t newSize)
 	{
@@ -135,7 +147,10 @@ public:
 			{
 				tmpBuff[i] = buff_[i];
 			}
-			delete[] buff_;
+			if (buff_!=nullptr)
+			{
+				delete[] buff_;
+			}
 			buff_ = tmpBuff;
 			capacity_ = newCapacity;
 		}
@@ -150,16 +165,6 @@ public:
 		pushBack(T(std::forward<Args>(args)...));
 	}; 
 
-	T& operator [] (size_t index) const
-	{
-#ifdef Debug
-		if (size_ <= index) //error reporter
-		{
-			throw DebugException(L"vector index is out of range");
-		}
-#endif Debug
-		return buff_[index];
-	};
 	IPVector<T>& operator = (const IPVector<T>& v)
 	{
 #ifdef Debug
@@ -183,18 +188,24 @@ public:
 		{
 			tmpBuff[i] = v.buff_[i];
 		}
-		//delete[] buff_; //TODO ?
+		if (buff_ != nullptr)
+		{
+			delete[] buff_;
+		}
 		size_ = v.size_;
 		capacity_ = v.capacity_;
 		buff_ = tmpBuff;
 		return *this;
 	};
-	IPVector<T>& operator = (IPVector<T>&& v)
+	IPVector<T>& operator = (IPVector<T>&& v) noexcept
 	{
 #ifdef Debug
 		std::cout << "= && operator" << std::endl;
 #endif Debug
-		delete[] buff_;
+		if (buff_ != nullptr)
+		{
+			delete[] buff_;
+		}
 		buff_ = v.buff_;
 		size_ = v.size_;
 		capacity_ = v.capacity_;
@@ -205,8 +216,18 @@ public:
 
 		return *this;
 	};
-
-	static void ShowV(IPVector<T>& v)
+	T& operator [] (size_t index) const
+	{
+#ifdef Debug
+		if (size_ <= index) //error reporter
+		{
+			throw DebugException(L"vector index is out of range");
+		}
+#endif Debug
+		return buff_[index];
+	};
+	
+	static void ShowVectorElements(IPVector<T>& v)
 	{
 		//std::cout << std::endl;
 		std::cout << "&buff_: " << &v[0] << std::endl;
@@ -242,11 +263,10 @@ class IPVector<bool>
 		{
 			return (*container_ >> index_) & 1u;
 		}
-
-		unsigned int& operator[](size_t index)
+		/*unsigned int& operator[](size_t index)
 		{
 			return *container_;
-		}
+		}*/
 
 	private:
 		unsigned int* container_;
@@ -257,10 +277,16 @@ public:
 	static constexpr unsigned int blockSize_ = 32u; //minimum memory block size in bits. sizeof(unsigned int)*8 = 32
 
 public:
-	typedef unsigned int* Iterator;
+	typedef unsigned int* Iterator; //a pointer to a container where the certain bit is
 	Iterator begin() { return buff_; };
-	Iterator end() { return buff_ + size_; };
+	Iterator end() { return buff_ + size_ / blockSize_; };
 
+	explicit IPVector() : size_(0), capacity_(0), buff_(nullptr)
+	{
+#ifdef Debug
+		std::cout << "default constructor" << std::endl;
+#endif Debug
+	};
 	explicit IPVector(unsigned int size) : size_(size)
 	{
 		if (size <= blockSize_)
@@ -272,7 +298,8 @@ public:
 		else
 		{
 			//buff_ = (unsigned int*)std::malloc(sizeof(unsigned int)* std::ceil(size / 32));
-			unsigned int blocksCount = std::ceil(static_cast<float>(size) / static_cast<float>(blockSize_));
+			//unsigned int blocksCount = std::ceil(static_cast<float>(size) / static_cast<float>(blockSize_));
+			unsigned int blocksCount = size / blockSize_ + 1;
 			buff_ = new unsigned int[blocksCount]();
 			capacity_ = blocksCount*blockSize_;
 		}
@@ -280,7 +307,7 @@ public:
 		std::cout << "bool size_t constructor " << size_ << " " << capacity_ << " " << buff_ << " " << &buff_[0] << std::endl;
 #endif Debug
 	};
-	/*explicit IPVector(const IPVector<bool>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new unsigned int[v.capacity_]) //explicit copy constructor?
+	explicit IPVector(const IPVector<bool>& v) : size_(v.size_), capacity_(v.capacity_), buff_(new unsigned int[v.capacity_/blockSize_]) //explicit copy constructor?
 	{
 #ifdef Debug
 		std::cout << "bool COPY constructor" << std::endl;
@@ -289,22 +316,167 @@ public:
 		{
 			buff_[i] = v.buff_[i];
 		}
-	};*/
-	
-	unsigned int* getBlockAddress(unsigned int index) const { return &buff_[index / blockSize_]; };
+	};
+	IPVector(IPVector<bool>&& v) noexcept : size_(v.size_), capacity_(v.capacity_), buff_(v.buff_)
+	{
+#ifdef Debug
+		std::cout << "bool MOVE constructor" << std::endl;
+#endif Debug
+		v.size_ = 0;
+		v.capacity_ = 0;
+		v.buff_ = nullptr;
+	};
+
+	const unsigned int* getBlockAddress(const unsigned int index) const { return &buff_[index / blockSize_]; };
 	size_t getSize() const { return size_; };
 	size_t getCapacity() const { return capacity_; };
 	bool isEmpty() const { return size_ == 0; };
-	unsigned int& front() { return *begin(); };
-	unsigned int& back() { return *(end() - 1); };
+	bool front() { return BitHelper(begin(), 0); };
+	bool back() { return BitHelper(end(), size_/blockSize_-1); };
+
 	void shrinkToFit()
 	{
 #ifdef Debug
 		std::cout << "shrinkToFit" << std::endl;
 #endif Debug
-		capacity_ = size_;
+		unsigned int blocksCount = size_ / blockSize_ + 1;
+
+		if (size_ < capacity_)
+		{
+			unsigned int* tmpBuff = new unsigned int[blocksCount];
+			for (size_t i = 0; i < size_; ++i)
+			{
+				tmpBuff[i] = buff_[i];
+			}
+			delete[] buff_;
+			buff_ = tmpBuff;
+			capacity_ = size_ / blockSize_ + 1;
+		}
+	};
+	void pushBack(const bool &val)
+	{
+#ifdef Debug
+		std::cout << "bool pushBack" << std::endl;
+#endif Debug
+		if (size_ == 0)
+		{
+			reserve(1);
+		}
+		else if (size_ == capacity_)
+		{
+			reserve(size_ + size_ / 2);
+		}
+		BitHelper(end(), size_++ / blockSize_ - 1) = val;
 	};
 
+	void popBack()
+	{
+		std::cout << "bool popBack" << std::endl;
+		if (size_ == 0) //error reporter
+		{
+#ifdef Debug
+			throw DebugException(L"vector is empty");
+#endif Debug
+		}
+		else
+		{
+			--size_;
+		}
+	};
+	void clear()
+	{
+#ifdef Debug
+		std::cout << "bool clear" << std::endl;
+#endif Debug
+		size_ = 0;
+		capacity_ = 0;
+		delete[] buff_;
+		buff_ = nullptr;
+	};
+	void resize(size_t newSize)
+	{
+		if (newSize != size_)
+		{
+#ifdef Debug
+			std::cout << "bool resize" << std::endl;
+#endif Debug
+			reserve(newSize);
+			size_ = newSize;
+		}
+	};
+	void reserve(size_t newCapacity)
+	{
+		if (newCapacity > capacity_)
+		{
+#ifdef Debug
+			std::cout << "bool reserve" << std::endl;
+#endif Debug
+			unsigned int blocksCount = newCapacity / blockSize_ + 1;
+
+			unsigned int* tmpBuff = new unsigned int[blocksCount];
+			for (size_t i = 0; i < blocksCount; ++i)
+			{
+				tmpBuff[i] = buff_[i];
+			}
+			if (buff_ != nullptr)
+			{
+				delete[] buff_;
+			}
+			buff_ = tmpBuff;
+			capacity_ = newCapacity;
+		}
+	};
+
+	IPVector<bool>& operator = (const IPVector<bool>& v)
+	{
+		if (this == &v)
+		{
+			return *this;
+		}
+		if (v.size_ <= capacity_)
+		{
+			for (size_t i = 0; i < v.size_; ++i)
+			{
+				buff_[i] = v.buff_[i];
+			}
+			size_ = v.size_;
+			return *this;
+		}
+		auto blocksCount = v.size_ / blockSize_ + 1;
+		unsigned int* tmpBuff = new unsigned int[blocksCount];
+		for (size_t i = 0; i < blocksCount; ++i)
+		{
+			tmpBuff[i] = v.buff_[i];
+		}
+		if (buff_ != nullptr)
+		{
+			delete[] buff_;
+		}
+		size_ = v.size_;
+		capacity_ = v.capacity_;
+		buff_ = tmpBuff;
+		return *this;
+	}
+	IPVector<bool>& operator = (IPVector<bool>&& v) noexcept
+	{
+#ifdef Debug
+		std::cout << "bool = && operator" << std::endl;
+#endif Debug
+		if (buff_ != nullptr)
+		{
+			delete[] buff_;
+		}
+		buff_ = v.buff_;
+		size_ = v.size_;
+		capacity_ = v.capacity_;
+
+		v.size_ = 0;
+		v.capacity_ = 0;
+		v.buff_ = nullptr;
+
+		return *this;
+
+	}
 	BitHelper operator[] (size_t index) const
 	{
 		/* *buff_ |= 1u << index;
@@ -313,11 +485,12 @@ public:
 		unsigned int bit = masked >> index;
 		bool boolBit = static_cast<bool>(bit);
 		unsigned int blockNumber = std::ceil(static_cast<float>(index+1) / static_cast<float>(blockSize_));
-		
+
 		std::cout << "operator[] " << &buff_[index / blockSize_] << " " << buff_[index / blockSize_] << std::endl;
 		std::cout << sizeof(BitHelper) << std::endl;*/
 		return BitHelper(&buff_[index / blockSize_], index);
 	};
+
 
 	~IPVector() {
 #ifdef Debug
@@ -326,7 +499,7 @@ public:
 		//std::free(buff_); };
 		delete[] buff_; };
 
-	static void ShowV(const IPVector<bool>& v)
+	static void ShowVectorElements(const IPVector<bool>& v)
 	{
 		std::cout << "&buff_: " << v.getBlockAddress(0) << std::endl;
 
@@ -342,7 +515,7 @@ public:
 private:
 	unsigned int size_;			//in bits
 	unsigned int capacity_;		//in bits
-	unsigned int* buff_;		//min block size is sizeof(unsigned int) = 8 bytes = 32bits 
+	unsigned int* buff_;		//min block size is sizeof(unsigned int) = 8 bytes = 32bits
 };
 #endif VectorStructExample
 

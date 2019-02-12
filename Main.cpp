@@ -224,6 +224,17 @@ int main(int argc, char** argv)
 
 #ifdef VectorStructExample
 
+	std::vector<int> v(2);
+	v.resize(20);
+	v.resize(5);
+
+	v.shrink_to_fit();
+
+	std::vector<bool> b1(2);
+	b1[0] = 1;
+	auto fdfd = b1.front();
+	auto sa = b1.begin();
+
 	///T IPVector
 	IPVector<int> vec1 = { 1,2 };
 	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);			//initializer list
@@ -243,11 +254,10 @@ int main(int argc, char** argv)
 	vec1.shrinkToFit();
 	assert(vec1.getSize() == 29 && vec1.getCapacity() == 29 &&
 		vec1[0] == 5);												//shrinkToFit
-
-
+	
 	vec1.resize(5);
 	assert(vec1.getSize() == 5 && vec1.getCapacity() == 29 &&
-		//vec1.back() == 5 &&
+		vec1[0] == 5 &&
 		& vec1.back() - &vec1.front() + 1 == vec1.getSize());		//resize to less
 
 	vec1.clear();
@@ -257,17 +267,33 @@ int main(int argc, char** argv)
 	vec2 = IPVector<int>(2);										
 	assert(vec2.getSize() == 2 && vec2.getCapacity() == 2);			//=&& operator
 
+	vec1.pushBack(5);
+	vec2[1] = 5;
 	vec1 = vec2;
-	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2);			//copy constructor
-
+	assert(vec1.getSize() == 2 && vec1.getCapacity() == 2 &&
+		vec1[1] == 5);												//= operator
 
 	///bool IPVector
 	IPVector<bool> vecBool1(33);
 	
 	vecBool1[0] = true;
+	vecBool1[1] = true;
 	vecBool1[32] = true;
+	vecBool1.pushBack(0);
+	vecBool1.pushBack(1);
+	vecBool1.popBack();
 
-	IPVector<bool>::ShowV(vecBool1);
+	auto hjdf = vecBool1.front();
+	auto hjdfff = vecBool1.back();
+
+	IPVector<bool> vecBool2(IPVector<bool>(2));
+	
+	vecBool2 = vecBool1;
+	assert(vecBool2.getSize() == 33 && vecBool2.getCapacity() == 64 &&
+		vecBool2[0] == true && vecBool2[32] == true);				//= operator
+
+	
+	//IPVector<bool>::ShowVectorElements(vecBool1);
 
 
 #endif VectorStructExample
