@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClInclude Include="Algorithms.h" />
     <ClInclude Include="IPException.h" />
+    <ClInclude Include="IPSharedPtr.h" />
     <ClInclude Include="IPVector.h" />
     <ClInclude Include="LinearAlgebra.h" />
     <ClInclude Include="MemoryManagement.h" />

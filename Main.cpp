@@ -8,97 +8,16 @@
 #include "IPVector.h"
 #include "MemoryManagement.h"
 #include "Stuff.h"
+#include "IPSharedPtr.h"
 
 #include "vld.h" //Visual Leak Detector
 
+#include <memory>
+
 //#define StringDevider //devide your string with any symbol
-
-#ifdef VectorStructExample
-
-/*void ShowV(IPVector<int>& v)
-{
-	//std::cout << std::endl;
-	std::cout << "&buff_: " << &v[0] << std::endl;
-	for (size_t i = 0; i < v.getSize(); ++i)
-	{
-		std::cout << i << "    val: " << v[i] << "  &: "<< &v[i] << std::endl;
-	}
-	std::cout << "Size: " << v.getSize() << std::endl;
-	std::cout << "Capacity: " << v.getCapacity() << std::endl;
-	std::cout << std::endl;
-}*/
-
-struct President
-{
-	std::string name;
-	std::string country;
-	int year;
-
-	President() {}
-	President(std::string p_name, std::string p_country, int p_year)
-		: name(std::move(p_name)), country(std::move(p_country)), year(p_year)
-	{
-		std::cout << "I am being constructed.\n";
-	}
-	President(President&& other)
-		: name(std::move(other.name)), country(std::move(other.country)), year(other.year)
-	{
-		std::cout << "I am being moved.\n";
-	}
-	President& operator=(const President& other) = default;
-};
-#endif VectorStructExample
 
 int main(int argc, char** argv)
 {
-#ifdef StringReverse
-	std::string str = "ABCDE";
-	StrReverseChar(str);
-	StrReverseXOR(str);
-	std::cout << str << std::endl;
-#endif StringReverse
-
-#ifdef MegreSort
-
-	int A[] = { 5, 2, 4, 6, 1, 3, 2, 6 };
-	constexpr unsigned int arrayLength = sizeof(A) / sizeof(int);
-
-	MergeSort(A, 1, arrayLength);
-
-	for (size_t i = 0; i < arrayLength; ++i)
-	{
-		std::cout << A[i] << ' ';
-	}
-
-#endif MegreSort
-
-#ifdef MinMaxSimultaneously
-
-	std::random_device rd;
-	std::mt19937 rng(rd());
-	std::uniform_int_distribution<int> dst(INT_MIN, INT_MAX);
-	constexpr unsigned int arrSize = 100u;
-	int min, max;
-	int arr[arrSize];
-
-	SimultaneouslyMinMax(arr, arrSize);
-
-#endif MinMaxSimultaneously
-
-#ifdef InsertionSort
-
-	int arr[] = { 5, 2, 4, 6, 1, 3, 2, 6 };
-	constexpr unsigned int arrayLength = sizeof(arr) / sizeof(int);
-
-	SortInsertion(arr, arrayLength);
-
-	for (size_t i = 0; i < arrayLength; ++i)
-	{
-		std::cout << arr[i] << ' ';
-	}
-
-#endif InsertionSort
-
 #ifdef StringDevider
 	std::string myString, tmpString;
 	std::vector<std::string> subStrings;
@@ -126,7 +45,7 @@ int main(int argc, char** argv)
 				tmpItem = i;
 			}
 		}
-	}
+}
 
 	//if it's the last tmpString without key (end of entered string)
 	if (tmpString != "")
@@ -138,7 +57,48 @@ int main(int argc, char** argv)
 	{
 		std::cout << n << std::endl;
 	}
-#endif StringDevider
+#endif //StringDevider
+
+#ifdef MegreSort
+
+	int A[] = { 5, 2, 4, 6, 1, 3, 2, 6 };
+	constexpr unsigned int arrayLength = sizeof(A) / sizeof(int);
+
+	MergeSort(A, 1, arrayLength);
+
+	for (size_t i = 0; i < arrayLength; ++i)
+	{
+		std::cout << A[i] << ' ';
+	}
+
+#endif //MegreSort
+
+#ifdef MinMaxSimultaneously
+
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_int_distribution<int> dst(INT_MIN, INT_MAX);
+	constexpr unsigned int arrSize = 100u;
+	int min, max;
+	int arr[arrSize];
+
+	SimultaneouslyMinMax(arr, arrSize);
+
+#endif //MinMaxSimultaneously
+
+#ifdef InsertionSort
+
+	int arr[] = { 5, 2, 4, 6, 1, 3, 2, 6 };
+	constexpr unsigned int arrayLength = sizeof(arr) / sizeof(int);
+
+	SortInsertion(arr, arrayLength);
+
+	for (size_t i = 0; i < arrayLength; ++i)
+	{
+		std::cout << arr[i] << ' ';
+	}
+
+#endif //InsertionSort
 
 #ifdef BezierFindCoords 
 	int x1, y1; //start point
@@ -215,11 +175,7 @@ int main(int argc, char** argv)
 			std::cout << "x = " << n.second << " y = " << GetPointSingleCoord(y1, y2, y3, n.first) << std::endl << std::endl;
 		}
 	}
-#endif BezierFindCoords
-
-#ifdef PlacementNew
-	PlacementExample();
-#endif PlacementNew
+#endif //BezierFindCoords
 
 #ifdef VectorStructExample
 
@@ -229,6 +185,7 @@ int main(int argc, char** argv)
 
 	v.shrink_to_fit();
 	v.emplace_back();
+
 	std::vector<bool> b1(2);
 	b1[0] = 1;
 	auto fdfd = b1.front();
@@ -297,7 +254,7 @@ int main(int argc, char** argv)
 	//copyMoveSemantics
 	auto copyMoveSemantics = []()
 	{
-		IPVector<int> vec1(30);
+ 		IPVector<int> vec1(30);
 		vec1[0] = 1;
 		vec1.clear();
 		IPVector<int> vec2(IPVector<int>(2)); //TODO no move constructor cuz compiler optimization?
@@ -321,15 +278,13 @@ int main(int argc, char** argv)
 	};
 	emplace();
 
-
-
-
 	///bool IPVector
 	IPVector<bool> vecBool1(33);
 	
 	vecBool1[0] = true;
 	vecBool1[1] = true;
 	vecBool1[32] = true;
+	IPVector<bool>::ShowVectorElements(vecBool1);
 	vecBool1.pushBack(0);
 	vecBool1.pushBack(1);
 	vecBool1.popBack();
@@ -347,10 +302,64 @@ int main(int argc, char** argv)
 	//IPVector<bool>::ShowVectorElements(vecBool1);
 
 
-#endif VectorStructExample
+#endif //VectorStructExample
+
+#ifdef IPSharedPtrExample
+
+	FStream fStream("test.txt");
+	
 
 
+	std::cout << '\n';
 
+	IPSharedPtr<int> p1 (new int(5));
+	IPSharedPtr<int> p2;
+	bool jsks = p1;
+	p2 = p1;
+
+	//std::cout << "val: " << *p1 << " &: " << &p1 << " data&: " << p1.getRawPtr() << '\n';
+	std::cout << "val: " << *p2 << " &: " << &p2 << " data&: " << p2.getRawPtr() << '\n';
+	
+	auto fdfhhsd(p1);
+
+	std::cout << '\n';
+
+	IPSharedPtr<int> p3(new int(6));
+	IPSharedPtr<int> p4;
+
+	p4 = p3;
+
+	std::cout << "val: " << *p3 << " &: " << &p3 << '\n';
+	std::cout << "val: " << *p4 << " &: " << &p4 << '\n';
+
+	auto fdfggsd(p3);
+
+
+	std::cout << '\n';
+	
+	std::shared_ptr<int> sp1 (new int(5));
+	std::shared_ptr<int> sp2;
+	//sp2 = sp1;
+
+	sp2 = std::move(sp1);
+
+	auto fdfd = sp1;
+
+	//std::cout << "val: " << *sp1 << " &: " << &sp1 << " data&: " << sp1 << '\n';
+	std::cout << "val: " << *sp2 << " &: " << &sp2 << " data&: " << sp2 << '\n';
+
+
+	std::shared_ptr<int> sp3(new int(6));
+	std::shared_ptr<int> sp4;
+	sp4 = sp3;
+
+	auto fdfsdsd = sp3;
+
+	std::cout << "val: " << *sp3 << " &: " << &sp3 << " data&: " << sp3 << '\n';
+	std::cout << "val: " << *sp4 << " &: " << &sp4 << " data&: " << sp4 << '\n';
+	
+	
+#endif //IPSharedPtrExample
 
 
 

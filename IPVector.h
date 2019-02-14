@@ -2,11 +2,12 @@
 //TODO <bool> blocksCount to separate function?
 #pragma once
 #ifdef _DEBUG
-#define DebugException(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
 #define Debug
 #endif //_DEBUG
 
-#define VectorStructExample
+#define ExceptionMessage(msg) _CrtDbgReportW(_CRT_ASSERT, __FILEW__, __LINE__, NULL, L"%ls", msg);
+
+//#define VectorStructExample
 
 #ifdef VectorStructExample
 template <typename T>
@@ -48,6 +49,7 @@ public:
 		v.capacity_ = 0;
 		v.buff_ = nullptr;
 	};
+
 	IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
 	{
 #ifdef Debug
@@ -102,12 +104,13 @@ public:
 	};
 	void popBack()
 	{
+#ifdef Debug
 		std::cout << "popBack" << std::endl;
+		#endif //Debug
+
 		if (size_ == 0) //error reporter
 		{
-#ifdef Debug
-			throw DebugException(L"vector is empty");
-#endif //Debug
+			throw ExceptionMessage(L"vector is empty");
 		}
 		else
 		{
@@ -153,8 +156,8 @@ public:
 		}
 	};
 
-	template<class... Args>
-	void emplaceBack(Args&&... args) //TODO WIP
+	template<typename... Args>
+	void emplaceBack(Args&&... args)
 	{
 #ifdef Debug
 		std::cout << "emplaceBack" << std::endl;
@@ -213,12 +216,10 @@ public:
 	};
 	T& operator [] (size_t index) const
 	{
-#ifdef Debug
 		if (size_ <= index) //error reporter
 		{
-			throw DebugException(L"vector index is out of range");
+			throw ExceptionMessage(L"vector index is out of range");
 		}
-#endif //Debug
 		return buff_[index];
 	};
 	
@@ -363,15 +364,15 @@ public:
 		}
 		BitHelper(end(), size_++ / blockSize_ - 1) = val;
 	};
-
 	void popBack()
 	{
+#ifdef Debug
 		std::cout << "bool popBack" << std::endl;
+#endif //Debug
+
 		if (size_ == 0) //error reporter
 		{
-#ifdef Debug
-			throw DebugException(L"vector is empty");
-#endif //Debug
+			throw ExceptionMessage(L"vector is empty");
 		}
 		else
 		{
@@ -471,15 +472,6 @@ public:
 	}
 	BitHelper operator[] (size_t index) const
 	{
-		/* *buff_ |= 1u << index;
-		unsigned int mask = 1 << index;
-		unsigned int masked = *buff_ & mask;
-		unsigned int bit = masked >> index;
-		bool boolBit = static_cast<bool>(bit);
-		unsigned int blockNumber = std::ceil(static_cast<float>(index+1) / static_cast<float>(blockSize_));
-
-		std::cout << "operator[] " << &buff_[index / blockSize_] << " " << buff_[index / blockSize_] << std::endl;
-		std::cout << sizeof(BitHelper) << std::endl;*/
 		return BitHelper(&buff_[index / blockSize_], index);
 	};
 
@@ -510,164 +502,3 @@ private:
 	unsigned int* buff_;		//min block size is sizeof(unsigned int) = 8 bytes = 32bits
 };
 #endif //VectorStructExample
-
-/*template<typename T>
-inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])
-{}
-
-template<typename T>
-inline IPVector<T>::IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
-{
-#ifdef Debug
-	std::cout << "initializer_list constructor" << std::endl;
-#endif Debug
-
-	std::copy(lst.begin(), lst.end(), buff_);
-}
-
-template<typename T>
-inline IPVector<T>::IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v.capacity_)
-{
-#ifdef Debug
-	std::cout << "COPY constructor" << std::endl;
-#endif Debug
-
-	buff_ = new T[v.capacity_];
-	for (size_t i = 0; i < v.size_; ++i)
-	{
-		buff_[i] = v.buff_[i];
-	}
-}
-
-template<typename T>
-inline IPVector<T>::IPVector(IPVector<T>&& v) noexcept: size_(v.size_), capacity_(v.capacity_), buff_(v.buff_)
-{
-#ifdef Debug
-	std::cout << "MOVE constructor" << std::endl;
-#endif Debug
-	
-	v.size_ = 0;
-	v.capacity_ = 0;
-	v.buff_ = nullptr;
-}
-
-template<typename T>
-inline void IPVector<T>::pushBack(const T & val)
-{
-#ifdef Debug
-	std::cout << "pushBack" << std::endl;
-#endif Debug
-
-	if (size_ < capacity_)
-	{
-		buff_[size_++] = val;
-	}
-	else
-	{
-		size_t tmpSize = size_;
-		resize(size_+ size_/2);
-		buff_[tmpSize] = val;
-	}
-}
-
-template<typename T>
-inline void IPVector<T>::popBack()
-{
-#ifdef Debug
-	std::cout << "popBack" << std::endl;
-#endif Debug
-
-	if (size_==0) //error reporter
-	{
-		throw DebugException(L"vector is empty");
-	}
-	else
-	{
-		--size_;
-	}
-}
-
-template<typename T>
-inline void IPVector<T>::clear()
-{
-#ifdef Debug
-	std::cout << "clear" << std::endl;
-#endif Debug
-
-	size_ = 0;
-	capacity_ = 0;
-	delete[] buff_;
-}
-
-template<typename T>
-inline void IPVector<T>::resize(size_t newSize)
-{
-	if (newSize != size_)
-	{
-#ifdef Debug
-		std::cout << "resize" << std::endl;
-#endif Debug
-
-		reserve(newSize);
-		size_ = newSize;
-	}
-}
-
-template<typename T>
-inline void IPVector<T>::reserve(size_t newCapacity)
-{
-	if (newCapacity > capacity_)
-	{
-#ifdef Debug
-		std::cout << "reserve" << std::endl;
-#endif Debug
-		T* tmpBuff = new T[newCapacity];
-		for (size_t i = 0; i < size_; ++i)
-		{
-			tmpBuff[i] = buff_[i];
-		}
-		delete[] buff_;
-		buff_ = tmpBuff;
-		capacity_ = newCapacity;
-	}
-}
-
-template<typename T>
-inline T & IPVector<T>::operator[](size_t index) const
-{
-	if (size_ <= index) //error reporter
-	{
-		throw DebugException(L"vector index is out of range");
-	}
-	return buff_[index];
-}
-
-template<typename T>
-inline IPVector<T> IPVector<T>::operator=(const IPVector<T>& v)
-{
-#ifdef Debug
-	std::cout << "= operator" << std::endl;
-#endif Debug
-
-	return IPVector<T>(v);
-}
-
-template<typename T>
-inline IPVector<T> & IPVector<T>::operator=(IPVector&& v)
-{
-#ifdef Debug
-	std::cout << "= && operator" << std::endl;
-#endif Debug
-	buff_ = v.buff_;
-	size_ = v.size_;
-	capacity_ = v.capacity_;
-
-	v.size_ = 0;
-	v.capacity_ = 0;
-	v.buff_ = nullptr;
-
-	return *this;
-}
-
-#endif VectorStructExample
-*/

@@ -190,4 +190,164 @@ int main(int argc, char** argv)
 
 
 
-#endif Placeholder
+#endif //Placeholder
+
+#ifdef oldVec
+template<typename T>
+inline IPVector<T>::IPVector(size_t size) : size_(size), capacity_(size), buff_(new T[capacity_])
+{}
+
+template<typename T>
+inline IPVector<T>::IPVector(std::initializer_list<T> lst) : size_(lst.size()), capacity_(lst.size()), buff_(new T[lst.size()])
+{
+#ifdef Debug
+std::cout << "initializer_list constructor" << std::endl;
+#endif Debug
+
+std::copy(lst.begin(), lst.end(), buff_);
+}
+
+template<typename T>
+inline IPVector<T>::IPVector(const IPVector<T>& v) : size_(v.size_), capacity_(v.capacity_)
+{
+#ifdef Debug
+std::cout << "COPY constructor" << std::endl;
+#endif Debug
+
+buff_ = new T[v.capacity_];
+for (size_t i = 0; i < v.size_; ++i)
+{
+buff_[i] = v.buff_[i];
+}
+}
+
+template<typename T>
+inline IPVector<T>::IPVector(IPVector<T>&& v) noexcept: size_(v.size_), capacity_(v.capacity_), buff_(v.buff_)
+{
+#ifdef Debug
+std::cout << "MOVE constructor" << std::endl;
+#endif Debug
+
+v.size_ = 0;
+v.capacity_ = 0;
+v.buff_ = nullptr;
+}
+
+template<typename T>
+inline void IPVector<T>::pushBack(const T & val)
+{
+#ifdef Debug
+std::cout << "pushBack" << std::endl;
+#endif Debug
+
+if (size_ < capacity_)
+{
+buff_[size_++] = val;
+}
+else
+{
+size_t tmpSize = size_;
+resize(size_+ size_/2);
+buff_[tmpSize] = val;
+}
+}
+
+template<typename T>
+inline void IPVector<T>::popBack()
+{
+#ifdef Debug
+std::cout << "popBack" << std::endl;
+#endif Debug
+
+if (size_==0) //error reporter
+{
+throw DebugException(L"vector is empty");
+}
+else
+{
+--size_;
+}
+}
+
+template<typename T>
+inline void IPVector<T>::clear()
+{
+#ifdef Debug
+std::cout << "clear" << std::endl;
+#endif Debug
+
+size_ = 0;
+capacity_ = 0;
+delete[] buff_;
+}
+
+template<typename T>
+inline void IPVector<T>::resize(size_t newSize)
+{
+if (newSize != size_)
+{
+#ifdef Debug
+std::cout << "resize" << std::endl;
+#endif Debug
+
+reserve(newSize);
+size_ = newSize;
+}
+}
+
+template<typename T>
+inline void IPVector<T>::reserve(size_t newCapacity)
+{
+if (newCapacity > capacity_)
+{
+#ifdef Debug
+std::cout << "reserve" << std::endl;
+#endif Debug
+T* tmpBuff = new T[newCapacity];
+for (size_t i = 0; i < size_; ++i)
+{
+tmpBuff[i] = buff_[i];
+}
+delete[] buff_;
+buff_ = tmpBuff;
+capacity_ = newCapacity;
+}
+}
+
+template<typename T>
+inline T & IPVector<T>::operator[](size_t index) const
+{
+if (size_ <= index) //error reporter
+{
+throw DebugException(L"vector index is out of range");
+}
+return buff_[index];
+}
+
+template<typename T>
+inline IPVector<T> IPVector<T>::operator=(const IPVector<T>& v)
+{
+#ifdef Debug
+std::cout << "= operator" << std::endl;
+#endif Debug
+
+return IPVector<T>(v);
+}
+
+template<typename T>
+inline IPVector<T> & IPVector<T>::operator=(IPVector&& v)
+{
+#ifdef Debug
+std::cout << "= && operator" << std::endl;
+#endif Debug
+buff_ = v.buff_;
+size_ = v.size_;
+capacity_ = v.capacity_;
+
+v.size_ = 0;
+v.capacity_ = 0;
+v.buff_ = nullptr;
+
+return *this;
+}
+#endif //oldVec
