@@ -9,15 +9,21 @@
 #include "MemoryManagement.h"
 #include "Stuff.h"
 #include "IPSharedPtr.h"
+#include "factory.h"
 
 #include "vld.h" //Visual Leak Detector
 
 #include <memory>
 
+#include "factory.h"
+
 //#define StringDevider //devide your string with any symbol
 
 int main(int argc, char** argv)
 {
+
+
+
 #ifdef StringDevider
 	std::string myString, tmpString;
 	std::vector<std::string> subStrings;

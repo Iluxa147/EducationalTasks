@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{89dd19ee-a779-4267-b6bf-26fd63844dc8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tmp.cpp">
@@ -20,6 +23,9 @@
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Car.cpp">
+      <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +49,21 @@
     </ClInclude>
     <ClInclude Include="IPSharedPtr.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Car.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="List.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="stream.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Wheel.h">
+      <Filter>tests</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

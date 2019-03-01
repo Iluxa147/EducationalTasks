@@ -114,17 +114,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Car.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="tmp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithms.h" />
+    <ClInclude Include="Car.h" />
+    <ClInclude Include="factory.h" />
     <ClInclude Include="IPException.h" />
     <ClInclude Include="IPSharedPtr.h" />
     <ClInclude Include="IPVector.h" />
     <ClInclude Include="LinearAlgebra.h" />
+    <ClInclude Include="List.h" />
     <ClInclude Include="MemoryManagement.h" />
+    <ClInclude Include="stream.h" />
     <ClInclude Include="Stuff.h" />
+    <ClInclude Include="Wheel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
